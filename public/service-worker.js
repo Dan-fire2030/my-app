@@ -24,39 +24,46 @@ self.addEventListener("install", (event) => {
 
 // キャッシュの使用とフォールバック
 self.addEventListener("fetch", (event) => {
-  if (
-    event.request.url.includes("Icon-192.png") ||
-    event.request.url.includes("Icon-512.png")
-  ) {
-    event.respondWith(caches.match(event.request)); // キャッシュから取得
-  } else {
-    event.respondWith(
-      caches.match(event.request).then((response) => {
-        // キャッシュが見つかればそれを返す
-        if (response) {
-          return response;
-        }
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      // キャッシュにあればそれを返す
+      if (response) {
+        return response;
+      }
 
-        // キャッシュにない場合はネットワークリクエスト
-        return fetch(event.request).then((response) => {
-          // レスポンスが有効かを確認
+      // キャッシュになければネットワークから取得
+      return fetch(event.request)
+        .then((networkResponse) => {
+          // レスポンスが有効か確認
           if (
-            !response ||
-            response.status !== 200 ||
-            response.type !== "basic"
+            !networkResponse ||
+            networkResponse.status !== 200 ||
+            networkResponse.type !== "basic"
           ) {
-            return response;
+            return networkResponse;
           }
 
-          // レスポンスをクローンしてキャッシュに追加
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+          // レスポンスをキャッシュに保存 (アイコン以外)
+          if (
+            !event.request.url.includes("Icon-192.png") &&
+            !event.request.url.includes("Icon-512.png")
+          ) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
 
-          return response;
+          return networkResponse;
+        })
+        .catch((error) => {
+          console.error("Fetch error:", error);
+          // エラー発生時の処理 (例: オフラインページを表示)
+          return new Response("Offline", {
+            status: 503,
+            headers: { "Content-Type": "text/html" },
+          });
         });
-      })
-    );
-  }
+    })
+  );
 });
