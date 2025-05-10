@@ -9,7 +9,8 @@ const urlsToCache = [
   '/static/js/bundle.js',
   '/manifest.json',
   '/favicon.ico',
-  '/logo192.png'
+  '/Icon-192.png',
+  '/Icon-512.png',
 ];
 
 // インストール時のキャッシュ
