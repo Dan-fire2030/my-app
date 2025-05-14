@@ -12,6 +12,31 @@ dist
 dist-ssr
 *.local
 
+# キャッシュ
+.vite/
+.cache/
+.eslintcache
+.stylelintcache
+.parcel-cache
+.next/
+
+# 環境変数
+.env
+.env.development
+.env.test
+.env.production
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# テストカバレッジ
+coverage/
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +47,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# その他
+.temp
+.tmp
+.history/
+.turbo/

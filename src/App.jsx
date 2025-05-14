@@ -66,6 +66,16 @@ const BudgetApp = () => {
     buttonSuccess: {
       backgroundColor: '#10b981',
     },
+    toggleButton: {
+      backgroundColor: '#6366f1',
+      color: 'white',
+      padding: '8px 16px',
+      borderRadius: '4px',
+      border: 'none',
+      fontWeight: '500',
+      cursor: 'pointer',
+      width: '100%'
+    },
     flexBetween: {
       display: 'flex',
       justifyContent: 'space-between',
@@ -98,6 +108,9 @@ const BudgetApp = () => {
       fontSize: '14px',
       color: '#6b7280',
       marginTop: '8px'
+    },
+    expenseFormContainer: {
+      marginTop: '12px'
     }
   };
 
@@ -133,7 +146,8 @@ const BudgetApp = () => {
     }
   };
 
-  const switchingFunction = () => setSwitchingButton(prev => !prev);
+  const toggleExpenseForm = () => setSwitchingButton(prev => !prev);
+
 
   return (
     <div style={styles.container}>
@@ -142,23 +156,21 @@ const BudgetApp = () => {
       {/* 予算設定セクション */}
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>月次予算設定</h2>
-        <button style={styles.inputGroup} onClick={switchingFunction}>
-          {switchingButton && `
+        <div style={styles.inputGroup}>
           <input
             type="number"
-            value={${budgetInput}}
-            onChange={${(e) => setBudgetInput(e.target.value)}}
-            style={${styles.input}}
+            value={budgetInput}
+            onChange={(e) => setBudgetInput(e.target.value)}
+            style={styles.input}
             placeholder="予算を入力"
           />
           <button
-            onClick={${handleSetBudget}}
-            style={${{ ...styles.button, ...styles.buttonPrimary }}}
+            onClick={handleSetBudget}
+            style={{ ...styles.button, ...styles.buttonPrimary }}
           >
             設定
-          </button>`}
-          支出を入力
-        </button>
+          </button>
+        </div>
         <p style={styles.note}>※新しい予算を設定すると、取引履歴はリセットされます</p>
       </div>
 
@@ -180,21 +192,33 @@ const BudgetApp = () => {
       {/* 支出入力セクション */}
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>支出を記録</h2>
-        <div style={styles.inputGroup}>
-          <input
-            type="number"
-            value={expenseAmount}
-            onChange={(e) => setExpenseAmount(e.target.value)}
-            style={styles.input}
-            placeholder="支出金額を入力"
-          />
-          <button
-            onClick={handleAddExpense}
-            style={{ ...styles.button, ...styles.buttonSuccess }}
-          >
-            記録
-          </button>
-        </div>
+
+        <button
+          onClick={toggleExpenseForm}
+          style={styles.toggleButton}
+        >
+          {switchingButton ? '入力フォームを閉じる' : '支出を入力する'}
+        </button>
+
+        {switchingButton && (
+          <div style={styles.expenseFormContainer}>
+            <div style={styles.inputGroup}>
+              <input
+                type="number"
+                value={expenseAmount}
+                onChange={(e) => setExpenseAmount(e.target.value)}
+                style={styles.input}
+                placeholder="支出金額を入力"
+              />
+              <button
+                onClick={handleAddExpense}
+                style={{ ...styles.button, ...styles.buttonSuccess }}
+              >
+                記録
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 取引履歴 */}
