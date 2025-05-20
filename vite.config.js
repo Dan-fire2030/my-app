@@ -1,20 +1,31 @@
+// vite.config.js
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: "localhost", // WSL環境でもWindows側のブラウザから接続可能に
-    port: 3000, // デフォルトポート（変更可能）
-    strictPort: true, // ポートが使用中ならエラー
-    watch: {
-      usePolling: true, // WSLでのファイル変更検出を安定化
-    },
+    port: 8080, // ポート番号を5173から8080に変更
+    strictPort: true, // ポートが使用中の場合はエラーを表示
     hmr: {
+      // HMR (Hot Module Replacement) の設定
       protocol: "ws",
       host: "localhost",
-      clientPort: 5173,
+      port: 8080, // WebSocketも同じポートを使用
+    },
+    watch: {
+      // ファイル監視の設定
+      usePolling: true,
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+        },
+      },
     },
   },
 });
