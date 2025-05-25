@@ -1,12 +1,21 @@
 import { useState, useEffect } from 'react';
+import {
+  getLatestBudget,
+  createNewBudget,
+  updateBudgetTransactions,
+  getBudgetHistory
+} from '../utils/supabaseFunctions';
 
 const BudgetApp = () => {
+
   // 状態管理
   const [monthlyBudget, setMonthlyBudget] = useState(0);
   const [currentBalance, setCurrentBalance] = useState(0);
   const [expenseAmount, setExpenseAmount] = useState('');
   const [budgetInput, setBudgetInput] = useState('');
   const [transactions, setTransactions] = useState([]);
+  const [monthlyHistory, setMonthlyHistory] = useState([]);
+  const [currentBudgetId, setCurrentBudgetId] = useState(null);
 
   const [switchingButton, setSwitchingButton] = useState(false);
   const [hiddenButton, setHiddenButton] = useState(false);
@@ -115,35 +124,97 @@ const BudgetApp = () => {
     }
   };
 
-  // 予算を設定する関数
-  const handleSetBudget = () => {
+  // 初期データ読み込み
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const { data: latestBudget } = await getLatestBudget();
+        if (latestBudget) {
+          setMonthlyBudget(latestBudget.amount);
+          setCurrentBudgetId(latestBudget.id);
+          setTransactions(latestBudget.transactions || []);
+          setCurrentBalance(
+            latestBudget.amount -
+            (latestBudget.transactions || []).reduce((sum, t) => sum + t.amount, 0)
+          );
+        }
+
+        const { data: history } = await getBudgetHistory();
+        if (history && history.length > 0) {
+          // 最新のものを除外して履歴として表示
+          setMonthlyHistory(history.slice(1));
+        }
+      } catch (error) {
+        console.error('初期データ取得エラー:', error);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
+
+  // 予算設定
+  const handleSetBudget = async (e) => {
+    e.preventDefault();
     if (budgetInput && !isNaN(budgetInput)) {
-      const newBudget = parseFloat(budgetInput);
-      setMonthlyBudget(newBudget);
-      setCurrentBalance(newBudget);
-      // 取引履歴をリセット
-      setTransactions([]);
-      setBudgetInput('');
+      const newBudget = {
+        amount: parseFloat(budgetInput),
+        transactions: []
+      };
+
+      try {
+        const { data } = await createNewBudget(newBudget);
+        if (data) {
+          // 現在の予算を履歴に追加
+          if (monthlyBudget > 0) {
+            setMonthlyHistory([
+              {
+                budget: monthlyBudget,
+                transactions: transactions
+              },
+              ...monthlyHistory
+            ]);
+          }
+
+          // 新しい予算をセット
+          setMonthlyBudget(data.amount);
+          setCurrentBudgetId(data.id);
+          setCurrentBalance(data.amount);
+          setTransactions([]);
+          setBudgetInput('');
+        }
+      } catch (error) {
+        console.error('予算設定エラー:', error);
+      }
     }
   };
 
-  // 支出を記録する関数
-  const handleAddExpense = () => {
-    if (expenseAmount && !isNaN(expenseAmount)) {
+  // 支出記録
+  const handleAddExpense = async (e) => {
+    e.preventDefault();
+    if (expenseAmount && !isNaN(expenseAmount) && currentBudgetId) {
       const expense = parseFloat(expenseAmount);
       const newBalance = currentBalance - expense;
 
-      // 新しい取引を記録
       const newTransaction = {
-        id: Date.now(),
         amount: expense,
         date: new Date().toLocaleDateString(),
         remainingBalance: newBalance
       };
 
-      setTransactions([newTransaction, ...transactions]);
-      setCurrentBalance(newBalance);
-      setExpenseAmount('');
+      try {
+        const { data } = await updateBudgetTransactions(
+          currentBudgetId,
+          [...transactions, newTransaction]
+        );
+
+        if (data) {
+          setTransactions(data.transactions);
+          setCurrentBalance(newBalance);
+          setExpenseAmount('');
+        }
+      } catch (error) {
+        console.error('支出記録エラー:', error);
+      }
     }
   };
 
@@ -226,7 +297,7 @@ const BudgetApp = () => {
                 placeholder="支出金額を入力"
               />
               <button
-                onClick={handleAddExpense}
+                onClick={(e) => handleAddExpense(e)}
                 style={{ ...styles.button, ...styles.buttonSuccess }}
               >
                 記録
@@ -288,8 +359,8 @@ const BudgetApp = () => {
               <p style={{ color: '#6b7280' }}>取引記録はまだありません</p>
             ) : (
               <div>
-                {transactions.map(transaction => (
-                  <div key={transaction.id} style={styles.transactionItem}>
+                {transactions.map((transaction, index) => (
+                  <div key={index} style={styles.transactionItem}>
                     <div>
                       <span style={styles.expenseAmount}>-{transaction.amount.toLocaleString()}円</span>
                       <span style={styles.transactionDate}>({transaction.date})</span>
@@ -300,6 +371,34 @@ const BudgetApp = () => {
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+
+          {/* 月次履歴 */}
+          <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>月次履歴</h2>
+            {monthlyHistory.length === 0 ? (
+              <p style={{ color: '#6b7280' }}>月次履歴はまだありません</p>
+            ) : (
+              <ul style={{ paddingLeft: '1em', margin: 0 }}>
+                {monthlyHistory.map((history, index) => (
+                  <li key={index} style={{ marginBottom: '12px', listStyle: 'disc' }}>
+                    <span>予算: {history.budget.toLocaleString()}円</span>
+                    <ul style={{ paddingLeft: '1.5em', marginTop: '4px' }}>
+                      {history.transactions.map((transaction, transIndex) => (
+                        <li key={transIndex} style={{ marginBottom: '4px', listStyle: 'circle' }}>
+                          <span style={styles.expenseAmount}>
+                            -{transaction.amount.toLocaleString()}円
+                          </span>
+                          <span style={styles.transactionDate}>
+                            ({transaction.date})
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>
