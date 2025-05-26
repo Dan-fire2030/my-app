@@ -3,7 +3,7 @@ import {
   getLatestBudget,
   createNewBudget,
   updateBudgetTransactions,
-  getBudgetHistory
+  getBudgetHistory,
 } from '../utils/supabaseFunctions';
 
 const BudgetApp = () => {
@@ -218,6 +218,42 @@ const BudgetApp = () => {
     }
   };
 
+  // データの削除
+  const deleteTransactionByIndex = async (index) => {
+    if (!currentBudgetId) {
+      console.error("現在の予算IDがありません");
+      return;
+    }
+
+    try {
+      // Supabaseから現在のtransactionsを取得
+      const { data: budget, error: fetchError } = await getLatestBudget();
+      if (fetchError) {
+        console.error("取引データの取得に失敗しました:", fetchError);
+        return;
+      }
+
+      // transactions配列から指定されたインデックスを削除
+      const updatedTransactions = budget.transactions.filter((_, i) => i !== index);
+
+      // Supabaseに更新されたtransactionsを保存
+      const { error: updateError } = await updateBudgetTransactions(currentBudgetId, updatedTransactions);
+      if (updateError) {
+        console.error("取引データの更新に失敗しました:", updateError);
+        return;
+      }
+
+      // ローカル状態を更新
+      setTransactions(updatedTransactions);
+
+      // 残高を再計算
+      const newBalance = monthlyBudget - updatedTransactions.reduce((sum, t) => sum + t.amount, 0);
+      setCurrentBalance(newBalance);
+    } catch (error) {
+      console.error("取引削除中にエラーが発生しました:", error);
+    }
+  };
+
   // Service Workerを管理する
   useEffect(() => {
     // 既存のService Workerを一旦解除
@@ -368,6 +404,7 @@ const BudgetApp = () => {
                     <span style={transaction.remainingBalance < 0 ? styles.balanceNegative : styles.balancePositive}>
                       残高: {transaction.remainingBalance.toLocaleString()}円
                     </span>
+                    <button onClick={() => deleteTransactionByIndex(index)}>×</button>
                   </div>
                 ))}
               </div>
