@@ -3,8 +3,14 @@ import {
   getLatestBudget,
   createNewBudget,
   updateBudgetTransactions,
-  getBudgetHistory,
+  getBudgetHistory
 } from '../utils/supabaseFunctions';
+import ExpenseInput from './components/ExpenseInput';
+import BudgetSetting from './components/BudgetSetting';
+import BalanceDisplay from './components/BalanceDisplay';
+import TransactionHistory from './components/TransactionHistory';
+import MonthlyHistory from './components/MonthlyHistory';
+import RemainingAmountMeter from './components/RemainingAmountMeter';
 
 const BudgetApp = () => {
 
@@ -16,7 +22,6 @@ const BudgetApp = () => {
   const [transactions, setTransactions] = useState([]);
   const [monthlyHistory, setMonthlyHistory] = useState([]);
   const [currentBudgetId, setCurrentBudgetId] = useState(null);
-
   const [switchingButton, setSwitchingButton] = useState(false);
   const [hiddenButton, setHiddenButton] = useState(false);
 
@@ -249,6 +254,12 @@ const BudgetApp = () => {
       // 残高を再計算
       const newBalance = monthlyBudget - updatedTransactions.reduce((sum, t) => sum + t.amount, 0);
       setCurrentBalance(newBalance);
+
+      // 履歴データを更新
+      const { data: updatedHistory } = await getBudgetHistory();
+      if (updatedHistory && updatedHistory.length > 0) {
+        setMonthlyHistory(updatedHistory.slice(1)); // 最新のものを除外して履歴として表示
+      }
     } catch (error) {
       console.error("取引削除中にエラーが発生しました:", error);
     }
@@ -286,158 +297,60 @@ const BudgetApp = () => {
     <div style={styles.container}>
       <h1 style={styles.header}>家計簿アプリ</h1>
 
+      <div className="container modal"></div>
+
+      {/* 残量メーター */}
+      <RemainingAmountMeter
+        currentBalance={currentBalance}
+        monthlyBudget={monthlyBudget}
+      />
+
+      {/* 残り金額と支出金額の表示 */}
+      <BalanceDisplay
+        styles={styles}
+        monthlyBudget={monthlyBudget}
+        currentBalance={currentBalance}
+      />
+
       {/* 支出入力セクション */}
-      <div style={styles.section}>
-
-        {/* 残り金額と支出金額の表示 */}
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{
-            width: '100%',
-            height: '20px',
-            backgroundColor: '#ef4444',
-            borderRadius: '10px',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              width: `${Math.max((currentBalance / monthlyBudget) * 100, 0)}%`,
-              height: '100%',
-              backgroundColor: currentBalance < 0 ? '#ef4444' : '#10b981',
-              transition: 'width 0.3s ease'
-            }} />
-          </div>
-          <p style={{ textAlign: 'right', color: currentBalance < 0 ? '#ef4444' : '#10b981' }}>
-            {monthlyBudget > 0
-              ? ((currentBalance / monthlyBudget) * 100).toFixed(1) + '%'
-              : '100.0%'}
-          </p>
-        </div>
-
-        <h2>残りの金額：{currentBalance.toLocaleString()}</h2>
-        <h2>支出金額：{expenseAmount}</h2>
-
-        <button
-          onClick={() => setSwitchingButton(prev => !prev)}
-          style={styles.toggleButton}
-        >
-          {switchingButton ? '入力フォームを閉じる' : '支出を入力する'}
-        </button>
-
-        {switchingButton && (
-          <div style={styles.expenseFormContainer}>
-            <div style={styles.inputGroup}>
-              <input
-                type="number"
-                value={expenseAmount}
-                onChange={(e) => setExpenseAmount(e.target.value)}
-                style={styles.input}
-                placeholder="支出金額を入力"
-              />
-              <button
-                onClick={(e) => handleAddExpense(e)}
-                style={{ ...styles.button, ...styles.buttonSuccess }}
-              >
-                記録
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      <ExpenseInput
+        styles={styles}
+        expenseAmount={expenseAmount}
+        switchingButton={switchingButton}
+        setExpenseAmount={setExpenseAmount}
+        setSwitchingButton={setSwitchingButton}
+        handleAddExpense={handleAddExpense}
+      />
 
       <button
         onClick={() => setHiddenButton(prev => !prev)}
         style={styles.toggleButton}
       >
-        {hiddenButton ? '入力フォームを閉じる' : '---'}
+        {hiddenButton ? '入力フォームを閉じる' : '予算の設定　履歴の確認'}
       </button>
 
       {hiddenButton && (
         <div>
           {/* 予算設定セクション */}
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>月次予算設定</h2>
-            <div style={styles.inputGroup}>
-              <input
-                type="number"
-                value={budgetInput}
-                onChange={(e) => setBudgetInput(e.target.value)}
-                style={styles.input}
-                placeholder="予算を入力"
-              />
-              <button
-                onClick={handleSetBudget}
-                style={{ ...styles.button, ...styles.buttonPrimary }}
-              >
-                設定
-              </button>
-            </div>
-            <p style={styles.note}>※新しい予算を設定すると、取引履歴はリセットされます</p>
-          </div>
-
-          {/* 残高表示 */}
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>現在の状況</h2>
-            <div style={styles.flexBetween}>
-              <span>設定予算:</span>
-              <span style={{ fontWeight: '500' }}>{monthlyBudget.toLocaleString()}円</span>
-            </div>
-            <div style={styles.flexBetween}>
-              <span>残り金額:</span>
-              <span style={currentBalance < 0 ? styles.balanceNegative : styles.balancePositive}>
-                {currentBalance.toLocaleString()}円
-              </span>
-            </div>
-          </div>
+          <BudgetSetting
+            styles={styles}
+            budgetInput={budgetInput}
+            setBudgetInput={setBudgetInput}
+            handleSetBudget={handleSetBudget}
+          />
 
           {/* 取引履歴 */}
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>取引履歴</h2>
-            {transactions.length === 0 ? (
-              <p style={{ color: '#6b7280' }}>取引記録はまだありません</p>
-            ) : (
-              <div>
-                {transactions.map((transaction, index) => (
-                  <div key={index} style={styles.transactionItem}>
-                    <div>
-                      <span style={styles.expenseAmount}>-{transaction.amount.toLocaleString()}円</span>
-                      <span style={styles.transactionDate}>({transaction.date})</span>
-                    </div>
-                    <span style={transaction.remainingBalance < 0 ? styles.balanceNegative : styles.balancePositive}>
-                      残高: {transaction.remainingBalance.toLocaleString()}円
-                    </span>
-                    <button onClick={() => deleteTransactionByIndex(index)}>×</button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <TransactionHistory
+            styles={styles}
+            transactions={transactions}
+            deleteTransactionByIndex={deleteTransactionByIndex}
+          />
 
           {/* 月次履歴 */}
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>月次履歴</h2>
-            {monthlyHistory.length === 0 ? (
-              <p style={{ color: '#6b7280' }}>月次履歴はまだありません</p>
-            ) : (
-              <ul style={{ paddingLeft: '1em', margin: 0 }}>
-                {monthlyHistory.map((history, index) => (
-                  <li key={index} style={{ marginBottom: '12px', listStyle: 'disc' }}>
-                    <span>予算: {history.budget.toLocaleString()}円</span>
-                    <ul style={{ paddingLeft: '1.5em', marginTop: '4px' }}>
-                      {history.transactions.map((transaction, transIndex) => (
-                        <li key={transIndex} style={{ marginBottom: '4px', listStyle: 'circle' }}>
-                          <span style={styles.expenseAmount}>
-                            -{transaction.amount.toLocaleString()}円
-                          </span>
-                          <span style={styles.transactionDate}>
-                            ({transaction.date})
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <MonthlyHistory
+            styles={styles}
+            monthlyHistory={monthlyHistory}
+          />
         </div>
       )}
     </div>

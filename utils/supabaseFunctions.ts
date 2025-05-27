@@ -117,42 +117,42 @@ export const getBudgetHistory = async () => {
   }
 };
 
-export const deleteTransactionByIndex = async (
-  budgetId: string,
-  transactionIndex: number
-) => {
-  try {
-    // 1. 該当するレコードを取得
-    const { data: budget, error: fetchError } = await supabase
-      .from("budget_book")
-      .select("transactions")
-      .eq("id", budgetId)
-      .single();
+// export const deleteTransactionByIndex = async (
+//   budgetId: string,
+//   transactionIndex: number
+// ) => {
+//   try {
+//     // 1. 該当するレコードを取得
+//     const { data: budget, error: fetchError } = await supabase
+//       .from("budget_book")
+//       .select("transactions")
+//       .eq("id", budgetId)
+//       .single();
 
-    if (fetchError) {
-      console.error("Error fetching budget:", fetchError);
-      return { success: false, error: fetchError };
-    }
+//     if (fetchError) {
+//       console.error("Error fetching budget:", fetchError);
+//       return { success: false, error: fetchError };
+//     }
 
-    // 2. 配列から指定されたインデックス番号の要素を削除
-    const updatedTransactions = budget.transactions.filter(
-      (_: any, index: number) => index !== transactionIndex
-    );
+//     // 2. 配列から指定されたインデックス番号の要素を削除
+//     const updatedTransactions = budget.transactions.filter(
+//       (_: any, index: number) => index !== transactionIndex
+//     );
 
-    // 3. 更新された配列を保存
-    const { error: updateError } = await supabase
-      .from("budget_book")
-      .update({ transactions: updatedTransactions })
-      .eq("id", budgetId);
+//     // 3. 更新された配列を保存
+//     const { error: updateError } = await supabase
+//       .from("budget_book")
+//       .update({ transactions: updatedTransactions })
+//       .eq("id", budgetId);
 
-    if (updateError) {
-      console.error("Error updating transactions:", updateError);
-      return { success: false, error: updateError };
-    }
+//     if (updateError) {
+//       console.error("Error updating transactions:", updateError);
+//       return { success: false, error: updateError };
+//     }
 
-    return { success: true, error: null };
-  } catch (error) {
-    console.error("Unexpected error:", error);
-    return { success: false, error };
-  }
-};
+//     return { success: true, error: null };
+//   } catch (error) {
+//     console.error("Unexpected error:", error);
+//     return { success: false, error };
+//   }
+// };
