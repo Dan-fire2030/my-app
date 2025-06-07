@@ -201,6 +201,35 @@ const MenuContent = styled.div`
   gap: 24px;
 `;
 
+// バーガーメニュー用の月次設定ボタン
+const BudgetSettingButton = styled.button`
+  width: 100%;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+  }
+  
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
 const ContentGrid = styled.div`
   display: grid;
   gap: 24px;
@@ -340,6 +369,7 @@ const BudgetSetupOverlay = styled.div`
 `;
 
 const BudgetSetupHeader = styled.div`
+  position: relative;
   text-align: center;
   margin-bottom: 32px;
 `;
@@ -788,12 +818,25 @@ const BudgetApp = () => {
           </ModalHeader>
           
           <MenuContent>
-            {!isCurrentMonthBudgetSet() && (
+            {/* 月次設定ボタン - 未設定時は通常のBudgetSetting、設定済み時はモーダル開くボタン */}
+            {!isCurrentMonthBudgetSet() ? (
               <BudgetSetting
                 budgetInput={budgetInput}
                 setBudgetInput={setBudgetInput}
                 handleSetBudget={handleSetBudget}
               />
+            ) : (
+              <BudgetSettingButton
+                onClick={() => {
+                  setShowBudgetModal(true);
+                  setMenuOpen(false);
+                }}
+              >
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                </svg>
+                月次予算を設定
+              </BudgetSettingButton>
             )}
 
             <TransactionHistory
@@ -810,7 +853,16 @@ const BudgetApp = () => {
         </MenuModal>
 
         {/* 月次予算設定モーダル */}
-        <BudgetSetupOverlay isOpen={showBudgetModal} />
+        <BudgetSetupOverlay 
+          isOpen={showBudgetModal} 
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowBudgetModal(false);
+              setBudgetConfirmStep(false);
+              setBudgetInput('');
+            }
+          }}
+        />
         <BudgetSetupModal isOpen={showBudgetModal}>
           <BudgetSetupHeader>
             <BudgetSetupTitle>
@@ -819,6 +871,22 @@ const BudgetApp = () => {
             <BudgetSetupSubtitle>
               今月の予算を設定してください
             </BudgetSetupSubtitle>
+            <CloseButton 
+              onClick={() => {
+                setShowBudgetModal(false);
+                setBudgetConfirmStep(false);
+                setBudgetInput('');
+              }}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px'
+              }}
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </CloseButton>
           </BudgetSetupHeader>
 
           <BudgetSetupContent>
