@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import BudgetApp from './App';
+import './index.css';
 import { register, preventWebSocketConnection } from './serviceWorkerRegistration';
 
 // eslint-disable-next-line no-undef

@@ -1,33 +1,215 @@
+import styled from 'styled-components';
+
+const Container = styled.div`
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+`;
+
+const Title = styled.h2`
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 20px;
+`;
+
+const PresetSection = styled.div`
+  margin-bottom: 20px;
+`;
+
+const SectionLabel = styled.p`
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 12px;
+`;
+
+const PresetGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+`;
+
+const PresetButton = styled.button`
+  padding: 10px;
+  background-color: #f3f4f6;
+  color: #374151;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #e5e7eb;
+    transform: translateY(-1px);
+  }
+`;
+
+const InputSection = styled.div`
+  margin-bottom: 20px;
+`;
+
+const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+`;
+
+const InputWrapper = styled.div`
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+`;
+
+const CurrencySymbol = styled.span`
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  font-size: 16px;
+`;
+
+const BudgetInput = styled.input`
+  width: 100%;
+  padding: 12px 12px 12px 32px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+  
+  &::placeholder {
+    color: #9ca3af;
+  }
+`;
+
+const SetButton = styled.button`
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+  
+  @media (min-width: 768px) {
+    width: auto;
+    min-width: 120px;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+  }
+  
+  &:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+`;
+
+const WarningBox = styled.div`
+  background-color: #fffbeb;
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+`;
+
+const WarningIcon = styled.svg`
+  width: 20px;
+  height: 20px;
+  color: #f59e0b;
+  flex-shrink: 0;
+  margin-top: 2px;
+`;
+
+const WarningText = styled.p`
+  font-size: 14px;
+  color: #92400e;
+  line-height: 1.5;
+`;
+
 const BudgetSetting = ({
-  styles,
   budgetInput,
   setBudgetInput,
   handleSetBudget,
 }) => {
+  const presetAmounts = [30000, 50000, 80000, 100000];
+
   return (
-    <>
-      <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>月次予算設定</h2>
-        <div style={styles.inputGroup}>
-          <input
-            type="number"
-            value={budgetInput}
-            onChange={(e) => setBudgetInput(e.target.value)}
-            style={styles.input}
-            placeholder="予算を入力"
-          />
-          <button
+    <Container>
+      <Title>月次予算設定</Title>
+      
+      <PresetSection>
+        <SectionLabel>よく使われる金額</SectionLabel>
+        <PresetGrid>
+          {presetAmounts.map((amount) => (
+            <PresetButton
+              key={amount}
+              onClick={() => setBudgetInput(amount.toString())}
+            >
+              ¥{amount.toLocaleString()}
+            </PresetButton>
+          ))}
+        </PresetGrid>
+      </PresetSection>
+
+      <InputSection>
+        <InputGroup>
+          <InputWrapper>
+            <CurrencySymbol>¥</CurrencySymbol>
+            <BudgetInput
+              type="number"
+              value={budgetInput}
+              onChange={(e) => setBudgetInput(e.target.value)}
+              placeholder="0"
+            />
+          </InputWrapper>
+          <SetButton
             onClick={handleSetBudget}
-            style={{ ...styles.button, ...styles.buttonPrimary }}
+            disabled={!budgetInput || budgetInput <= 0}
           >
-            設定
-          </button>
-        </div>
-        <p style={styles.note}>
-          ※新しい予算を設定すると、取引履歴はリセットされます
-        </p>
-      </div>
-    </>
+            設定する
+          </SetButton>
+        </InputGroup>
+      </InputSection>
+
+      <WarningBox>
+        <WarningIcon fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+        </WarningIcon>
+        <WarningText>
+          新しい予算を設定すると、現在の取引履歴はリセットされます
+        </WarningText>
+      </WarningBox>
+    </Container>
   );
 };
 
