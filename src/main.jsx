@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import BudgetApp from './App';
 import './index.css';
 import { register, preventWebSocketConnection } from './serviceWorkerRegistration';
+import { AuthProvider } from './contexts/AuthContext';
 
 // eslint-disable-next-line no-undef
 if (process.env.NODE_ENV === "production") {
@@ -30,5 +31,7 @@ const container = document.getElementById('root');
 const root = createRoot(container);
 root.render(
   // React.StrictModeを一時的に削除（開発時の二重レンダリングを防止）
-  <BudgetApp />
+  <AuthProvider>
+    <BudgetApp />
+  </AuthProvider>
 );

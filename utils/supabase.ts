@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from '../types/database';
 
 // 環境変数の取得
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
@@ -18,4 +19,12 @@ if (!supabaseAnonKey) {
 console.log('Supabase URL configured:', supabaseUrl ? 'Yes' : 'No');
 console.log('Supabase Key configured:', supabaseAnonKey ? 'Yes' : 'No');
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce',
+    storage: localStorage
+  }
+});

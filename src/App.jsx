@@ -13,6 +13,8 @@ import TransactionHistory from './components/TransactionHistory';
 import MonthlyHistory from './components/MonthlyHistory';
 import RemainingAmountMeter from './components/RemainingAmountMeter';
 import GenreBreakdown from './components/GenreBreakdown';
+import AuthPage from './components/AuthPage';
+import { useAuth } from './contexts/AuthContext';
 
 // 最小限のアニメーション定義
 const fadeIn = keyframes`
@@ -41,6 +43,57 @@ const Header = styled.div`
   text-align: center;
   margin-bottom: 32px;
   animation: ${fadeIn} 0.6s ease-out;
+`;
+
+const UserInfo = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 8px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 768px) {
+    position: static;
+    margin-bottom: 16px;
+    justify-content: center;
+  }
+`;
+
+const UserEmail = styled.span`
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+  
+  @media (max-width: 640px) {
+    font-size: 12px;
+  }
+`;
+
+const LogoutButton = styled.button`
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
 `;
 
 // シンプルなハンバーガーボタン
@@ -463,6 +516,31 @@ const ModalContainer = styled.div.attrs({
 `;
 
 const BudgetApp = () => {
+  const { user, loading, signOut } = useAuth();
+  
+  // 認証ローディング中の表示
+  if (loading) {
+    return (
+      <AppContainer>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '100vh',
+          fontSize: '18px',
+          color: '#6b7280'
+        }}>
+          読み込み中...
+        </div>
+      </AppContainer>
+    );
+  }
+
+  // 未ログインの場合は認証ページを表示
+  if (!user) {
+    return <AuthPage />;
+  }
+
   // 状態管理
   const [monthlyBudget, setMonthlyBudget] = useState(0);
   const [currentBalance, setCurrentBalance] = useState(0);
@@ -729,6 +807,13 @@ const BudgetApp = () => {
     <AppContainer>
       <MainContainer>
         <Header>
+          <UserInfo>
+            <UserEmail>{user?.email}</UserEmail>
+            <LogoutButton onClick={() => signOut()}>
+              ログアウト
+            </LogoutButton>
+          </UserInfo>
+          
           <HamburgerButton onClick={() => setMenuOpen(!menuOpen)}>
             <HamburgerIcon isOpen={menuOpen}>
               <div className="line"></div>

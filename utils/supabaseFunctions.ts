@@ -4,10 +4,12 @@ type Transaction = {
   amount: number;
   date: string;
   remainingBalance: number;
+  jenre: string;
 };
 
 type Budget = {
   id?: string;
+  user_id?: string;
   amount: number;
   transactions: Transaction[];
   created_at?: string;
@@ -38,15 +40,20 @@ export const addData = async (table: string, newData: any) => {
   return { data, error };
 };
 
-// 最新の予算を取得
+// 最新の予算を取得（ユーザー別）
 export const getLatestBudget = async () => {
   try {
+    // 現在のユーザーを取得
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { data, error } = await supabase
       .from("budget_book")
       .select("*")
+      .eq('user_id', user.id)
       .order("created_at", { ascending: false })
       .limit(1)
-      .maybeSingle(); // single() から maybeSingle() に変更
+      .maybeSingle();
 
     if (error) throw error;
 
@@ -57,14 +64,24 @@ export const getLatestBudget = async () => {
   }
 };
 
-// 新しい予算を作成
+// 新しい予算を作成（ユーザー別）
 export const createNewBudget = async (budget: Budget) => {
   try {
+    // 現在のユーザーを取得
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // user_idを追加してbudgetを作成
+    const budgetWithUserId = {
+      ...budget,
+      user_id: user.id
+    };
+
     const { data, error } = await supabase
       .from("budget_book")
-      .insert(budget)
+      .insert(budgetWithUserId)
       .select()
-      .maybeSingle(); // single() から maybeSingle() に変更
+      .maybeSingle();
 
     if (error) throw error;
 
@@ -75,31 +92,44 @@ export const createNewBudget = async (budget: Budget) => {
   }
 };
 
-// 予算のトランザクションを更新
+// 予算のトランザクションを更新（ユーザー認証付き）
 export const updateBudgetTransactions = async (
   budgetId: string,
   transactions: Transaction[]
 ) => {
-  const { data, error } = await supabase
-    .from("budget_book")
-    .update({ transactions })
-    .eq("id", budgetId)
-    .select()
-    .single();
+  try {
+    // 現在のユーザーを取得
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
 
-  if (error) {
+    const { data, error } = await supabase
+      .from("budget_book")
+      .update({ transactions })
+      .eq("id", budgetId)
+      .eq("user_id", user.id) // ユーザーの所有する予算のみ更新可能
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return { data, error: null };
+  } catch (error) {
     console.error("Error updating transactions:", error);
     return { data: null, error };
   }
-  return { data, error };
 };
 
-// 予算履歴を取得
+// 予算履歴を取得（ユーザー別）
 export const getBudgetHistory = async () => {
   try {
+    // 現在のユーザーを取得
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { data, error } = await supabase
       .from("budget_book")
       .select("*")
+      .eq('user_id', user.id)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
