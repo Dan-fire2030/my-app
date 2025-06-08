@@ -21,27 +21,16 @@ if (!supabaseAnonKey) {
 }
 
 
-// Supabaseクライアントの作成を試みる
+// URLとキーの検証
+console.log('Supabase URL format check:', supabaseUrl);
+console.log('URL is valid:', supabaseUrl.startsWith('https://'));
+console.log('Anon key length:', supabaseAnonKey.length);
+
+// Supabaseクライアントの作成を試みる（最小限の設定）
 let supabase;
 try {
-  supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-      flowType: 'implicit', // PKCEからimplicitに変更
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-      debug: true // デバッグモードを有効化
-    },
-    global: {
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    }
-  });
-  console.log('Supabase client created successfully');
+  supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+  console.log('Supabase client created successfully with minimal config');
 } catch (error) {
   console.error('Failed to create Supabase client:', error);
   throw error;

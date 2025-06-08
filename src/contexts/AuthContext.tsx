@@ -118,6 +118,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
+          skipBrowserRedirect: false, // 明示的に設定
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
       
