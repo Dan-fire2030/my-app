@@ -19,70 +19,35 @@ if (!supabaseAnonKey) {
 console.log('Supabase URL:', supabaseUrl);
 console.log('Supabase Anon Key exists:', !!supabaseAnonKey);
 
-// Supabaseクライアントの作成（認証エラー修正版）
+// Supabaseクライアントの作成（最小構成に戻す）
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-    storageKey: 'supabase.auth.token',
-    flowType: 'implicit'
-  },
-  // カスタムfetch実装でエラーをキャッチ
-  global: {
-    fetch: async (url, options = {}) => {
-      try {
-        console.log('Supabase fetch:', { url, options });
-        
-        // URL検証
-        if (!url || (typeof url !== 'string' && !(url instanceof URL))) {
-          console.error('Invalid URL:', url);
-          throw new Error('Invalid URL provided to fetch');
-        }
-        
-        // URLを文字列に変換
-        const urlString = url instanceof URL ? url.toString() : String(url);
-        
-        // ヘッダーを正しい形式に変換
-        const headers = new Headers();
-        if (options.headers) {
-          // HeadersInitの各種形式に対応
-          if (options.headers instanceof Headers) {
-            options.headers.forEach((value, key) => {
-              headers.append(key, value);
-            });
-          } else if (Array.isArray(options.headers)) {
-            options.headers.forEach(([key, value]) => {
-              headers.append(key, value);
-            });
-          } else if (typeof options.headers === 'object') {
-            Object.entries(options.headers).forEach(([key, value]) => {
-              if (value !== undefined && value !== null) {
-                headers.append(key, String(value));
-              }
-            });
-          }
-        }
-        
-        // オプションの再構築
-        const validOptions = {
-          ...options,
-          headers: headers
-        };
-        
-        console.log('Calling native fetch with valid options');
-        return await window.fetch(urlString, validOptions);
-      } catch (error) {
-        console.error('Fetch error details:', {
-          error,
-          url,
-          options,
-          errorMessage: error.message,
-          errorStack: error.stack
-        });
-        throw error;
-      }
-    }
+    detectSessionInUrl: false, // 自動検出を無効化
+    persistSession: false, // セッション永続化を無効化
+    autoRefreshToken: false, // 自動更新を無効化
   }
 });
+
+// 認証後のコールバック処理を手動で実装
+if (typeof window !== 'undefined') {
+  const hashParams = new URLSearchParams(window.location.hash.substring(1));
+  const accessToken = hashParams.get('access_token');
+  
+  if (accessToken) {
+    console.log('Manual token processing:', accessToken.substring(0, 20) + '...');
+    
+    // トークンを手動でセッションに設定
+    supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: hashParams.get('refresh_token') || '',
+    }).then(({ error }) => {
+      if (error) {
+        console.error('Session setting error:', error);
+      } else {
+        console.log('Session set successfully');
+        // URLのハッシュをクリア
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    });
+  }
+}
