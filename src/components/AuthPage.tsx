@@ -204,14 +204,17 @@ const AuthPage = () => {
   const handleGoogleSignIn = async () => {
     setError('');
     setLoading(true);
+    console.log('Google sign in button clicked');
     
     try {
       const { error } = await signInWithGoogle();
       if (error) {
-        setError(error.message);
+        console.error('Google sign in error:', error);
+        setError(error.message || 'Googleログインに失敗しました');
       }
     } catch (err) {
-      setError('Googleログインに失敗しました');
+      console.error('Unexpected error in handleGoogleSignIn:', err);
+      setError('Googleログインに失敗しました。コンソールを確認してください。');
     }
     
     setLoading(false);

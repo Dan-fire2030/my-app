@@ -3,24 +3,21 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from '../types/database';
 
 // 環境変数の取得
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 // 環境変数の存在チェック
-if (!supabaseUrl || supabaseUrl === 'undefined') {
-  throw new Error('VITE_SUPABASE_URL is not set');
+if (!supabaseUrl) {
+  throw new Error('VITE_SUPABASE_URL environment variable is missing. Please set it in Vercel Environment Variables.');
 }
 
-if (!supabaseAnonKey || supabaseAnonKey === 'undefined') {
-  throw new Error('VITE_SUPABASE_ANON_KEY is not set');
+if (!supabaseAnonKey) {
+  throw new Error('VITE_SUPABASE_ANON_KEY environment variable is missing. Please set it in Vercel Environment Variables.');
 }
 
-// URLの検証
-const cleanUrl = supabaseUrl.toString().trim();
-const cleanKey = supabaseAnonKey.toString().trim();
+// デバッグ用ログ
+console.log('Supabase URL:', supabaseUrl);
+console.log('Supabase Anon Key exists:', !!supabaseAnonKey);
 
-console.log('Initializing Supabase client...');
-console.log('URL valid:', cleanUrl.startsWith('https://'));
-
-// 最もシンプルな設定でクライアントを作成
-export const supabase = createClient<Database>(cleanUrl, cleanKey);
+// Supabaseクライアントの作成（動作していた最小構成）
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
