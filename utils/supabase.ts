@@ -26,14 +26,28 @@ console.log('Supabase URL format check:', supabaseUrl);
 console.log('URL is valid:', supabaseUrl.startsWith('https://'));
 console.log('Anon key length:', supabaseAnonKey.length);
 
-// Supabaseクライアントの作成を試みる（最小限の設定）
-let supabase;
-try {
-  supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
-  console.log('Supabase client created successfully with minimal config');
-} catch (error) {
-  console.error('Failed to create Supabase client:', error);
-  throw error;
-}
+// Supabaseクライアントの作成（本番環境用の修正）
+const supabase = createClient<Database>(
+  supabaseUrl.trim(), // 空白を削除
+  supabaseAnonKey.trim(), // 空白を削除
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce',
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    },
+    // fetchオプションを明示的に設定
+    global: {
+      fetch: (...args) => {
+        console.log('Fetch called with:', args[0]);
+        return fetch(...args);
+      },
+    }
+  }
+);
+
+console.log('Supabase client created successfully');
 
 export { supabase };
