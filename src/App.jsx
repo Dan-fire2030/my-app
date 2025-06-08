@@ -548,6 +548,17 @@ const BudgetApp = () => {
 
   // useEffectも条件分岐の前に配置
   useEffect(() => {
+    // URL認証処理を最初にチェック
+    const handleAuthCallback = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('code')) {
+        // 認証後のコールバック処理
+        console.log('Handling auth callback...');
+        // URLを清潔にする
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    };
+
     const getCurrentMonth = () => {
       const now = new Date();
       return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -596,7 +607,12 @@ const BudgetApp = () => {
       }
     };
 
-    fetchInitialData();
+    handleAuthCallback();
+    
+    // ユーザーがログインしている場合のみデータを取得
+    if (user) {
+      fetchInitialData();
+    }
 
     // Service Worker処理
     if ('serviceWorker' in navigator) {
@@ -606,7 +622,7 @@ const BudgetApp = () => {
         }
       });
     }
-  }, []);
+  }, [user]);
 
   // 認証ローディング中の表示
   if (loading) {

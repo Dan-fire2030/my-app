@@ -22,6 +22,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
-    storage: typeof window !== 'undefined' ? window.localStorage : undefined
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    debug: process.env.NODE_ENV === 'development'
   }
 });

@@ -35,10 +35,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // 初回セッション取得
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Session error:', error);
+        }
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      } catch (error) {
+        console.error('Auth error:', error);
+        setLoading(false);
+      }
     };
 
     getSession();
@@ -46,9 +54,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // 認証状態の変更を監視
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+        console.log('Auth state changed:', event, session?.user?.email);
+        
+        if (event === 'SIGNED_IN' && session) {
+          setSession(session);
+          setUser(session.user);
+          setLoading(false);
+        } else if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+          setLoading(false);
+        } else {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
       }
     );
 
@@ -72,18 +92,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signInWithGoogle = async () => {
-    const redirectUrl = typeof window !== 'undefined' 
-      ? `${window.location.protocol}//${window.location.host}`
-      : '';
-    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: redirectUrl || undefined,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
+        redirectTo: `${window.location.origin}/`,
       },
     });
     return { error: error || undefined };
