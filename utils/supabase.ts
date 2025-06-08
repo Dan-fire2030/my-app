@@ -26,7 +26,7 @@ console.log('Supabase URL format check:', supabaseUrl);
 console.log('URL is valid:', supabaseUrl.startsWith('https://'));
 console.log('Anon key length:', supabaseAnonKey.length);
 
-// Supabaseクライアントの作成（本番環境用の修正）
+// Supabaseクライアントの作成（fetchエラー修正版）
 const supabase = createClient<Database>(
   supabaseUrl.trim(), // 空白を削除
   supabaseAnonKey.trim(), // 空白を削除
@@ -35,15 +35,8 @@ const supabase = createClient<Database>(
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
-      flowType: 'pkce',
+      flowType: 'implicit', // implicitフローに変更
       storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-    },
-    // fetchオプションを明示的に設定
-    global: {
-      fetch: (...args) => {
-        console.log('Fetch called with:', args[0]);
-        return fetch(...args);
-      },
     }
   }
 );
