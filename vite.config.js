@@ -19,11 +19,17 @@ export default defineConfig({
       usePolling: true,
     },
   },
+  define: {
+    // fetch polyfillのためのグローバル定義
+    global: 'globalThis',
+  },
   build: {
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ["react", "react-dom"],
+          supabase: ["@supabase/supabase-js"],
+          fetch: ["cross-fetch", "whatwg-fetch"],
         },
       },
     },

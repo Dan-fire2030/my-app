@@ -1,16 +1,16 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session, AuthError } from '@supabase/supabase-js';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabase';
+import type { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<{ error?: AuthError }>;
-  signIn: (email: string, password: string) => Promise<{ error?: AuthError }>;
-  signInWithGoogle: () => Promise<{ error?: AuthError }>;
-  signOut: () => Promise<{ error?: AuthError }>;
-  resetPassword: (email: string) => Promise<{ error?: AuthError }>;
+  signUp: (email: string, password: string) => Promise<{ error?: Error }>;
+  signIn: (email: string, password: string) => Promise<{ error?: Error }>;
+  signInWithGoogle: () => Promise<{ error?: Error }>;
+  signOut: () => Promise<{ error?: Error }>;
+  resetPassword: (email: string) => Promise<{ error?: Error }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,61 +23,60 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 初回セッション取得
-    const getSession = async () => {
+    console.log('AuthProvider: Initializing...');
+    
+    let mounted = true;
+
+    // 初期セッションの取得
+    const getInitialSession = async () => {
       try {
+        console.log('AuthProvider: Getting initial session...');
         const { data: { session }, error } = await supabase.auth.getSession();
+        
         if (error) {
-          console.error('Session error:', error);
+          console.error('AuthProvider: Initial session error:', error);
+        } else {
+          console.log('AuthProvider: Initial session:', { 
+            hasSession: !!session, 
+            userId: session?.user?.id,
+            email: session?.user?.email 
+          });
         }
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+        
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
       } catch (error) {
-        console.error('Auth error:', error);
-        setLoading(false);
+        console.error('AuthProvider: Unexpected error getting session:', error);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
-    getSession();
+    getInitialSession();
 
     // 認証状態の変更を監視
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
-        
-        // エラーイベントのログ
-        if (event === 'INITIAL_SESSION') {
-          console.log('Initial session check');
-        } else if (event === 'SIGNED_IN') {
-          console.log('User signed in successfully');
-        } else if (event === 'SIGNED_OUT') {
-          console.log('User signed out');
-        } else if (event === 'TOKEN_REFRESHED') {
-          console.log('Token refreshed');
-        } else if (event === 'USER_UPDATED') {
-          console.log('User updated');
-        }
-        
-        if (event === 'SIGNED_IN' && session) {
-          setSession(session);
-          setUser(session.user);
-          setLoading(false);
-        } else if (event === 'SIGNED_OUT') {
-          setSession(null);
-          setUser(null);
-          setLoading(false);
-        } else {
+        console.log('AuthProvider: Auth state changed:', { 
+          event, 
+          hasSession: !!session,
+          userId: session?.user?.id,
+          email: session?.user?.email 
+        });
+
+        if (mounted) {
           setSession(session);
           setUser(session?.user ?? null);
           setLoading(false);
@@ -85,81 +84,109 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    return { error: error || undefined };
+    try {
+      console.log('AuthProvider: Sign up attempt for:', email);
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      
+      if (error) {
+        console.error('AuthProvider: Sign up error:', error);
+      }
+      
+      return { error: error || undefined };
+    } catch (err) {
+      console.error('AuthProvider: Sign up unexpected error:', err);
+      return { error: err as Error };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error: error || undefined };
+    try {
+      console.log('AuthProvider: Sign in attempt for:', email);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        console.error('AuthProvider: Sign in error:', error);
+      }
+      
+      return { error: error || undefined };
+    } catch (err) {
+      console.error('AuthProvider: Sign in unexpected error:', err);
+      return { error: err as Error };
+    }
   };
 
   const signInWithGoogle = async () => {
-    console.log('signInWithGoogle function called');
-    
     try {
-      // 現在の環境に応じたリダイレクトURLを設定
-      const getRedirectUrl = () => {
-        if (typeof window === 'undefined') return undefined;
-        
-        // 本番環境（Vercel）の場合
-        if (window.location.hostname.includes('vercel.app')) {
-          return window.location.origin;
-        }
-        
-        // 開発環境の場合
-        if (window.location.hostname === 'localhost') {
-          return window.location.origin;
-        }
-        
-        // その他の場合
-        return window.location.origin;
-      };
-
-      const redirectUrl = getRedirectUrl();
-      console.log('Redirect URL:', redirectUrl);
-      console.log('About to call supabase.auth.signInWithOAuth');
+      console.log('AuthProvider: Google sign in attempt');
       
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const redirectUrl = window.location.origin;
+      console.log('AuthProvider: Redirect URL:', redirectUrl);
+      
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
         },
       });
-      
-      console.log('OAuth call completed:', { data, error });
-      
+
       if (error) {
-        console.error('Google sign in error:', error);
+        console.error('AuthProvider: Google sign in error:', error);
+        return { error };
       }
-      
-      return { error: error || undefined };
+
+      console.log('AuthProvider: Google sign in initiated successfully');
+      return { error: undefined };
     } catch (err) {
-      console.error('Caught error in signInWithGoogle:', err);
+      console.error('AuthProvider: Google sign in unexpected error:', err);
       return { error: err as Error };
     }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    return { error: error || undefined };
+    try {
+      console.log('AuthProvider: Sign out attempt');
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('AuthProvider: Sign out error:', error);
+      }
+      
+      return { error: error || undefined };
+    } catch (err) {
+      console.error('AuthProvider: Sign out unexpected error:', err);
+      return { error: err as Error };
+    }
   };
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    return { error: error || undefined };
+    try {
+      console.log('AuthProvider: Password reset attempt for:', email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) {
+        console.error('AuthProvider: Password reset error:', error);
+      }
+      
+      return { error: error || undefined };
+    } catch (err) {
+      console.error('AuthProvider: Password reset unexpected error:', err);
+      return { error: err as Error };
+    }
   };
 
   const value = {
