@@ -6,30 +6,33 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 8080, // ポート番号を5173から8080に変更
-    strictPort: true, // ポートが使用中の場合はエラーを表示
+    port: 8080,
+    strictPort: true,
     hmr: {
-      // HMR (Hot Module Replacement) の設定
       protocol: "ws",
       host: "localhost",
-      port: 8080, // WebSocketも同じポートを使用
+      port: 8080,
     },
     watch: {
-      // ファイル監視の設定
       usePolling: true,
     },
   },
   define: {
-    // fetch polyfillのためのグローバル定義
     global: 'globalThis',
+    // ブラウザ互換性のための定義
+    'process.env': {},
+  },
+  optimizeDeps: {
+    include: ['@supabase/supabase-js'],
+    exclude: ['cross-fetch', 'whatwg-fetch']
   },
   build: {
+    target: 'es2020',
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ["react", "react-dom"],
           supabase: ["@supabase/supabase-js"],
-          fetch: ["cross-fetch", "whatwg-fetch"],
         },
       },
     },

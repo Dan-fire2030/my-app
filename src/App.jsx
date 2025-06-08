@@ -1,3 +1,41 @@
+// 最優先でfetch polyfillを適用
+if (typeof window !== 'undefined' && !window.fetch.toString().includes('Safe fetch')) {
+  console.log('Applying emergency fetch fix in App.jsx');
+  const originalFetch = window.fetch;
+  window.fetch = async function(input, init) {
+    try {
+      console.log('Emergency fetch intercept:', input);
+      
+      // 入力の正規化
+      let url = '';
+      if (typeof input === 'string') {
+        url = input;
+      } else if (input instanceof URL) {
+        url = input.toString();
+      } else if (input instanceof Request) {
+        url = input.url;
+      } else {
+        throw new Error('Invalid input type for fetch');
+      }
+
+      // 安全なinit作成
+      const safeInit = {
+        method: init?.method || 'GET',
+        headers: new Headers(init?.headers || {}),
+        body: init?.body,
+        mode: init?.mode || 'cors',
+        credentials: init?.credentials || 'same-origin',
+      };
+
+      console.log('Emergency fetch executing:', url, safeInit.method);
+      return await originalFetch.call(this, url, safeInit);
+    } catch (error) {
+      console.error('Emergency fetch error:', error);
+      throw error;
+    }
+  };
+}
+
 import { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import {
