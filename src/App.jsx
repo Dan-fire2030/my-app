@@ -7,7 +7,7 @@ import {
   createNewBudget,
   updateBudgetTransactions,
   getBudgetHistory
-} from '../utils/supabaseFunctions';
+} from '../utils/firebaseFunctions';
 import ExpenseInput from './components/ExpenseInput';
 import BudgetSetting from './components/BudgetSetting';
 import BalanceDisplay from './components/BalanceDisplay';
@@ -23,10 +23,10 @@ if (typeof window !== 'undefined') {
   const hash = window.location.hash;
   const params = new URLSearchParams(window.location.search);
   if (hash || params.toString()) {
-    console.log('Auth callback detected:', { 
-      hash, 
+    console.log('Auth callback detected:', {
+      hash,
       params: params.toString(),
-      fullURL: window.location.href 
+      fullURL: window.location.href
     });
   }
 }
@@ -193,8 +193,8 @@ const MenuModal = styled.div`
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: ${props => props.isOpen ? 
-    'translate(-50%, -50%) scale(1)' : 
+  transform: ${props => props.isOpen ?
+    'translate(-50%, -50%) scale(1)' :
     'translate(-50%, -50%) scale(0.95)'};
   width: 90vw;
   max-width: 600px;
@@ -350,8 +350,8 @@ const ExpenseModal = styled.div`
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: ${props => props.isOpen ? 
-    'translate(-50%, -50%) scale(1)' : 
+  transform: ${props => props.isOpen ?
+    'translate(-50%, -50%) scale(1)' :
     'translate(-50%, -50%) scale(0.95)'};
   width: 90vw;
   max-width: 500px;
@@ -414,8 +414,8 @@ const BudgetSetupModal = styled.div`
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: ${props => props.isOpen ? 
-    'translate(-50%, -50%) scale(1)' : 
+  transform: ${props => props.isOpen ?
+    'translate(-50%, -50%) scale(1)' :
     'translate(-50%, -50%) scale(0.95)'};
   width: 90vw;
   max-width: 480px;
@@ -544,7 +544,7 @@ const ModalContainer = styled.div.attrs({
 
 const BudgetApp = () => {
   const { user, loading, signOut } = useAuth();
-  
+
   // 状態管理（すべてのHooksを最初に配置）
   const [monthlyBudget, setMonthlyBudget] = useState(0);
   const [currentBalance, setCurrentBalance] = useState(0);
@@ -555,7 +555,6 @@ const BudgetApp = () => {
   const [transactions, setTransactions] = useState([]);
   const [monthlyHistory, setMonthlyHistory] = useState([]);
   const [currentBudgetId, setCurrentBudgetId] = useState(null);
-  const [switchingButton, setSwitchingButton] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [showBudgetModal, setShowBudgetModal] = useState(false);
@@ -583,24 +582,24 @@ const BudgetApp = () => {
 
     const isBudgetSetForCurrentMonth = (latestBudget) => {
       if (!latestBudget || !latestBudget.created_at) return false;
-      
+
       const budgetDate = new Date(latestBudget.created_at);
       const budgetMonth = `${budgetDate.getFullYear()}-${String(budgetDate.getMonth() + 1).padStart(2, '0')}`;
       const currentMonth = getCurrentMonth();
-      
+
       return budgetMonth === currentMonth;
     };
 
     const fetchInitialData = async () => {
       try {
         const { data: latestBudget, error: budgetError } = await getLatestBudget();
-        
+
         if (budgetError) {
           // Supabaseエラー時はモーダルを表示
           setShowBudgetModal(true);
           return;
         }
-        
+
         // 今月の予算が設定されているかチェック
         if (latestBudget && isBudgetSetForCurrentMonth(latestBudget)) {
           setMonthlyBudget(latestBudget.amount);
@@ -625,7 +624,7 @@ const BudgetApp = () => {
     };
 
     handleAuthCallback();
-    
+
     // ユーザーがログインしている場合のみデータを取得
     if (user) {
       fetchInitialData();
@@ -645,10 +644,10 @@ const BudgetApp = () => {
   if (loading) {
     return (
       <AppContainer>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           height: '100vh',
           fontSize: '18px',
           color: '#6b7280'
@@ -668,16 +667,6 @@ const BudgetApp = () => {
   const getCurrentMonth = () => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  };
-
-  const isBudgetSetForCurrentMonth = (latestBudget) => {
-    if (!latestBudget || !latestBudget.created_at) return false;
-    
-    const budgetDate = new Date(latestBudget.created_at);
-    const budgetMonth = `${budgetDate.getFullYear()}-${String(budgetDate.getMonth() + 1).padStart(2, '0')}`;
-    const currentMonth = getCurrentMonth();
-    
-    return budgetMonth === currentMonth;
   };
 
   const isCurrentMonthBudgetSet = () => {
@@ -723,7 +712,7 @@ const BudgetApp = () => {
           alert('予算設定に失敗しました。もう一度お試しください。');
           return;
         }
-        
+
         if (data) {
           if (monthlyBudget > 0) {
             setMonthlyHistory([
@@ -770,7 +759,7 @@ const BudgetApp = () => {
           alert('予算設定に失敗しました。もう一度お試しください。');
           return;
         }
-        
+
         if (data) {
           if (monthlyBudget > 0) {
             setMonthlyHistory([
@@ -874,7 +863,7 @@ const BudgetApp = () => {
               ログアウト
             </LogoutButton>
           </UserInfo>
-          
+
           <HamburgerButton onClick={() => setMenuOpen(!menuOpen)}>
             <HamburgerIcon className={menuOpen ? 'open' : ''}>
               <div className="line"></div>
@@ -916,13 +905,13 @@ const BudgetApp = () => {
         <ModalContainer />
 
         {/* 支出入力モーダル */}
-        <ExpenseOverlay 
-          isOpen={showExpenseForm} 
+        <ExpenseOverlay
+          isOpen={showExpenseForm}
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowExpenseForm(false);
             }
-          }} 
+          }}
         />
         <ExpenseModal isOpen={showExpenseForm}>
           <ExpenseModalHeader>
@@ -933,7 +922,7 @@ const BudgetApp = () => {
               </svg>
             </CloseButton>
           </ExpenseModalHeader>
-          
+
           <ExpenseInput
             expenseAmount={expenseAmount}
             switchingButton={true}
@@ -962,7 +951,7 @@ const BudgetApp = () => {
               </svg>
             </CloseButton>
           </ModalHeader>
-          
+
           <MenuContent>
             {/* 月次設定ボタン - 未設定時は通常のBudgetSetting、設定済み時はモーダル開くボタン */}
             {!isCurrentMonthBudgetSet() ? (
@@ -1000,8 +989,8 @@ const BudgetApp = () => {
         </MenuModal>
 
         {/* 月次予算設定モーダル */}
-        <BudgetSetupOverlay 
-          isOpen={showBudgetModal} 
+        <BudgetSetupOverlay
+          isOpen={showBudgetModal}
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowBudgetModal(false);
@@ -1018,7 +1007,7 @@ const BudgetApp = () => {
             <BudgetSetupSubtitle>
               今月の予算を設定してください
             </BudgetSetupSubtitle>
-            <CloseButton 
+            <CloseButton
               onClick={() => {
                 setShowBudgetModal(false);
                 setBudgetConfirmStep(false);
@@ -1048,7 +1037,7 @@ const BudgetApp = () => {
                     この金額で{getCurrentMonth().split('-')[1]}月の予算を設定しますか？
                   </BudgetConfirmText>
                 </BudgetConfirmSection>
-                
+
                 <BudgetActionButtons>
                   <BudgetActionButton onClick={handleBudgetModalCancel}>
                     戻る
@@ -1069,7 +1058,7 @@ const BudgetApp = () => {
                     handleBudgetModalSubmit();
                   }}
                 />
-                
+
                 <BudgetActionButtons>
                   <BudgetActionButton primary onClick={handleBudgetModalSubmit}>
                     確認画面へ
