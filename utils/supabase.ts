@@ -33,12 +33,33 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   global: {
     fetch: async (url, options = {}) => {
       try {
-        console.log('Supabase fetch:', url);
-        // URLが文字列でない場合の対処
-        const urlString = typeof url === 'string' ? url : String(url);
-        return await fetch(urlString, options);
+        console.log('Supabase fetch:', { url, options });
+        
+        // URL検証
+        if (!url || (typeof url !== 'string' && !(url instanceof URL))) {
+          console.error('Invalid URL:', url);
+          throw new Error('Invalid URL provided to fetch');
+        }
+        
+        // URLを文字列に変換
+        const urlString = url instanceof URL ? url.toString() : String(url);
+        
+        // オプションの検証
+        const validOptions = {
+          ...options,
+          headers: options?.headers || {}
+        };
+        
+        console.log('Calling native fetch with:', urlString);
+        return await window.fetch(urlString, validOptions);
       } catch (error) {
-        console.error('Fetch error:', error, 'URL:', url);
+        console.error('Fetch error details:', {
+          error,
+          url,
+          options,
+          errorMessage: error.message,
+          errorStack: error.stack
+        });
         throw error;
       }
     }
