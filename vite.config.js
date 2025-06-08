@@ -8,26 +8,8 @@ export default defineConfig({
   server: {
     port: 8080,
     strictPort: true,
-    hmr: {
-      protocol: "ws",
-      host: "localhost",
-      port: 8080,
-    },
-    watch: {
-      usePolling: true,
-    },
-  },
-  define: {
-    global: 'globalThis',
-    // ブラウザ互換性のための定義
-    'process.env': {},
-  },
-  optimizeDeps: {
-    include: ['@supabase/supabase-js'],
-    exclude: ['cross-fetch', 'whatwg-fetch']
   },
   build: {
-    target: 'es2020',
     rollupOptions: {
       output: {
         manualChunks: {

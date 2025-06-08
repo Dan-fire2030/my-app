@@ -35,47 +35,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     
     let mounted = true;
 
-    // 初期セッションの取得
-    const getInitialSession = async () => {
+    // 簡単な初期化
+    const initAuth = async () => {
       try {
-        console.log('AuthProvider: Getting initial session...');
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('AuthProvider: Initial session error:', error);
-        } else {
-          console.log('AuthProvider: Initial session:', { 
-            hasSession: !!session, 
-            userId: session?.user?.id,
-            email: session?.user?.email 
-          });
-        }
-        
         if (mounted) {
-          setSession(session);
-          setUser(session?.user ?? null);
           setLoading(false);
         }
       } catch (error) {
-        console.error('AuthProvider: Unexpected error getting session:', error);
+        console.error('AuthProvider: Init error:', error);
         if (mounted) {
           setLoading(false);
         }
       }
     };
 
-    getInitialSession();
+    initAuth();
 
     // 認証状態の変更を監視
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('AuthProvider: Auth state changed:', { 
-          event, 
-          hasSession: !!session,
-          userId: session?.user?.id,
-          email: session?.user?.email 
-        });
-
+      (event, session) => {
+        console.log('AuthProvider: Auth state changed:', event);
         if (mounted) {
           setSession(session);
           setUser(session?.user ?? null);
