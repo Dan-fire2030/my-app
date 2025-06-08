@@ -551,11 +551,13 @@ const BudgetApp = () => {
     // URL認証処理を最初にチェック
     const handleAuthCallback = async () => {
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('code')) {
+      if (urlParams.get('code') || urlParams.get('access_token') || urlParams.get('refresh_token')) {
         // 認証後のコールバック処理
         console.log('Handling auth callback...');
-        // URLを清潔にする
-        window.history.replaceState({}, document.title, window.location.pathname);
+        // 1秒待ってからURLを清潔にする（Supabaseの認証処理完了を待つ）
+        setTimeout(() => {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }, 1000);
       }
     };
 

@@ -24,5 +24,12 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     flowType: 'pkce',
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     debug: process.env.NODE_ENV === 'development'
+  },
+  global: {
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
   }
 });

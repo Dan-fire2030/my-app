@@ -92,10 +92,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signInWithGoogle = async () => {
+    // 現在の環境に応じたリダイレクトURLを設定
+    const getRedirectUrl = () => {
+      if (typeof window === 'undefined') return undefined;
+      
+      // 本番環境（Vercel）の場合
+      if (window.location.hostname.includes('vercel.app')) {
+        return window.location.origin;
+      }
+      
+      // 開発環境の場合
+      if (window.location.hostname === 'localhost') {
+        return window.location.origin;
+      }
+      
+      // その他の場合
+      return window.location.origin;
+    };
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: getRedirectUrl(),
       },
     });
     return { error: error || undefined };
