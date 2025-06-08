@@ -56,6 +56,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
         
+        // エラーイベントのログ
+        if (event === 'INITIAL_SESSION') {
+          console.log('Initial session check');
+        } else if (event === 'SIGNED_IN') {
+          console.log('User signed in successfully');
+        } else if (event === 'SIGNED_OUT') {
+          console.log('User signed out');
+        } else if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed');
+        } else if (event === 'USER_UPDATED') {
+          console.log('User updated');
+        }
+        
         if (event === 'SIGNED_IN' && session) {
           setSession(session);
           setUser(session.user);

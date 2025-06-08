@@ -16,6 +16,19 @@ import GenreBreakdown from './components/GenreBreakdown';
 import AuthPage from './components/AuthPage';
 import { useAuth } from './contexts/AuthContext';
 
+// URLパラメータをログ出力（認証コールバックのデバッグ用）
+if (typeof window !== 'undefined') {
+  const hash = window.location.hash;
+  const params = new URLSearchParams(window.location.search);
+  if (hash || params.toString()) {
+    console.log('Auth callback detected:', { 
+      hash, 
+      params: params.toString(),
+      fullURL: window.location.href 
+    });
+  }
+}
+
 // 最小限のアニメーション定義
 const fadeIn = keyframes`
   from { opacity: 0; }
