@@ -92,6 +92,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signInWithGoogle = async () => {
+    console.log('signInWithGoogle function called');
+    
     try {
       // 現在の環境に応じたリダイレクトURLを設定
       const getRedirectUrl = () => {
@@ -112,7 +114,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       };
 
       const redirectUrl = getRedirectUrl();
-      console.log('Attempting Google sign in with redirect URL:', redirectUrl);
+      console.log('Redirect URL:', redirectUrl);
+      console.log('About to call supabase.auth.signInWithOAuth');
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -121,7 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         },
       });
       
-      console.log('Google sign in response:', { data, error });
+      console.log('OAuth call completed:', { data, error });
       
       if (error) {
         console.error('Google sign in error:', error);
@@ -129,7 +132,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       return { error: error || undefined };
     } catch (err) {
-      console.error('Unexpected error in signInWithGoogle:', err);
+      console.error('Caught error in signInWithGoogle:', err);
       return { error: err as Error };
     }
   };
