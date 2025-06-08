@@ -92,31 +92,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signInWithGoogle = async () => {
-    // 現在の環境に応じたリダイレクトURLを設定
-    const getRedirectUrl = () => {
-      if (typeof window === 'undefined') return undefined;
-      
-      // 本番環境（Vercel）の場合
-      if (window.location.hostname.includes('vercel.app')) {
+    try {
+      // 現在の環境に応じたリダイレクトURLを設定
+      const getRedirectUrl = () => {
+        if (typeof window === 'undefined') return undefined;
+        
+        // 本番環境（Vercel）の場合
+        if (window.location.hostname.includes('vercel.app')) {
+          return window.location.origin;
+        }
+        
+        // 開発環境の場合
+        if (window.location.hostname === 'localhost') {
+          return window.location.origin;
+        }
+        
+        // その他の場合
         return window.location.origin;
-      }
-      
-      // 開発環境の場合
-      if (window.location.hostname === 'localhost') {
-        return window.location.origin;
-      }
-      
-      // その他の場合
-      return window.location.origin;
-    };
+      };
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: getRedirectUrl(),
-      },
-    });
-    return { error: error || undefined };
+      const redirectUrl = getRedirectUrl();
+      console.log('Attempting Google sign in with redirect URL:', redirectUrl);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+        },
+      });
+      
+      console.log('Google sign in response:', { data, error });
+      
+      if (error) {
+        console.error('Google sign in error:', error);
+      }
+      
+      return { error: error || undefined };
+    } catch (err) {
+      console.error('Unexpected error in signInWithGoogle:', err);
+      return { error: err as Error };
+    }
   };
 
   const signOut = async () => {

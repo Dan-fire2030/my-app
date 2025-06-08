@@ -21,20 +21,30 @@ if (!supabaseAnonKey) {
 }
 
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'implicit', // PKCEからimplicitに変更
-    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-    debug: true // デバッグモードを有効化
-  },
-  global: {
-    headers: {
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
+// Supabaseクライアントの作成を試みる
+let supabase;
+try {
+  supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+      flowType: 'implicit', // PKCEからimplicitに変更
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+      debug: true // デバッグモードを有効化
+    },
+    global: {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
     }
-  }
-});
+  });
+  console.log('Supabase client created successfully');
+} catch (error) {
+  console.error('Failed to create Supabase client:', error);
+  throw error;
+}
+
+export { supabase };
