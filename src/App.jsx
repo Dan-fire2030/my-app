@@ -16,7 +16,7 @@ import MonthlyHistory from './components/MonthlyHistory';
 import RemainingAmountMeter from './components/RemainingAmountMeter';
 import GenreBreakdown from './components/GenreBreakdown';
 import AuthPage from './components/AuthPage';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth } from './contexts/FirebaseAuthContext';
 
 // URLパラメータをログ出力（認証コールバックのデバッグ用）
 if (typeof window !== 'undefined') {

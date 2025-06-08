@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import BudgetApp from './App';
 import './index.css';
 import { register } from './serviceWorkerRegistration';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/FirebaseAuthContext';
 
 // Service Worker登録を一時的に無効化
 // if (process.env.NODE_ENV === "production") {
