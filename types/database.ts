@@ -1,7 +1,7 @@
 export interface Database {
   public: {
     Tables: {
-      budgets: {
+      budget_book: {
         Row: {
           id: string;
           user_id: string;

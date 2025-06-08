@@ -163,9 +163,7 @@ const AuthToggle = styled.div`
   font-size: 14px;
 `;
 
-interface AuthPageProps {}
-
-const AuthPage: React.FC<AuthPageProps> = () => {
+const AuthPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

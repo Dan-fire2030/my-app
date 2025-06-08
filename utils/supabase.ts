@@ -15,9 +15,6 @@ if (!supabaseAnonKey) {
   throw new Error('VITE_SUPABASE_ANON_KEY environment variable is missing. Please set it in Vercel Environment Variables.');
 }
 
-// デバッグ用ログ（本番環境では削除推奨）
-console.log('Supabase URL configured:', supabaseUrl ? 'Yes' : 'No');
-console.log('Supabase Key configured:', supabaseAnonKey ? 'Yes' : 'No');
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -25,6 +22,6 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
-    storage: localStorage
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined
   }
 });

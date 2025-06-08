@@ -14,7 +14,7 @@ export function register() {
         navigator.serviceWorker
           .register(swUrl)
           .then((registration) => {
-            console.log("Service Worker登録成功:", registration);
+            // Service Worker登録成功
 
             // 更新を確認
             registration.update();
@@ -26,17 +26,17 @@ export function register() {
                 installingWorker.onstatechange = () => {
                   if (installingWorker.state === "installed") {
                     if (navigator.serviceWorker.controller) {
-                      console.log("新しいService Workerが利用可能です");
+                      // console.log("新しいService Workerが利用可能です");
                     } else {
-                      console.log("Service Workerがオフラインで使用できます");
+                      // console.log("Service Workerがオフラインで使用できます");
                     }
                   }
                 };
               }
             };
           })
-          .catch((error) => {
-            console.error("Service Worker登録失敗:", error);
+          .catch(() => {
+            // Service Worker登録失敗
           });
       }, 1000); // 1秒待ってから再登録
     });

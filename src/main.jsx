@@ -2,36 +2,26 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import BudgetApp from './App';
 import './index.css';
-import { register, preventWebSocketConnection } from './serviceWorkerRegistration';
+import { register } from './serviceWorkerRegistration';
 import { AuthProvider } from './contexts/AuthContext';
 
-// eslint-disable-next-line no-undef
-if (process.env.NODE_ENV === "production") {
-  register(); // 開発時は登録しない
-}
+// Service Worker登録を一時的に無効化
+// if (process.env.NODE_ENV === "production") {
+//   register();
+// }
 
 
-// WebSocketの問題を防止
-preventWebSocketConnection();
+// WebSocketの問題を防止（コメントアウト）
+// preventWebSocketConnection();
 
-// 無限ループを防ぐためにReactの再レンダリング上限を設定
-// React DevToolsの設定をカスタマイズ
-// eslint-disable-next-line no-undef
-if (process.env.NODE_ENV === 'development') {
-  // デバッグ用の開発環境設定
-  window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
-    supportsFiber: true,
-    inject: () => { },
-    onCommitFiberRoot: () => { },
-    onCommitFiberUnmount: () => { },
-  };
-}
+// React DevToolsの設定（コメントアウト）
 
 const container = document.getElementById('root');
 const root = createRoot(container);
 root.render(
-  // React.StrictModeを一時的に削除（開発時の二重レンダリングを防止）
-  <AuthProvider>
-    <BudgetApp />
-  </AuthProvider>
+  <React.StrictMode>
+    <AuthProvider>
+      <BudgetApp />
+    </AuthProvider>
+  </React.StrictMode>
 );

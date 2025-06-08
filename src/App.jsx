@@ -140,23 +140,35 @@ const HamburgerIcon = styled.div`
     transition: all 0.3s ease;
     
     &:nth-child(1) {
-      top: ${props => props.isOpen ? '50%' : '25%'};
-      transform: ${props => props.isOpen ? 
-        'translateY(-50%) rotate(45deg)' : 
-        'translateY(-50%)'};
+      top: 25%;
+      transform: translateY(-50%);
     }
     
     &:nth-child(2) {
       top: 50%;
       transform: translateY(-50%);
-      opacity: ${props => props.isOpen ? '0' : '1'};
+      opacity: 1;
     }
     
     &:nth-child(3) {
-      top: ${props => props.isOpen ? '50%' : '75%'};
-      transform: ${props => props.isOpen ? 
-        'translateY(-50%) rotate(-45deg)' : 
-        'translateY(-50%)'};
+      top: 75%;
+      transform: translateY(-50%);
+    }
+  }
+  
+  &.open .line {
+    &:nth-child(1) {
+      top: 50%;
+      transform: translateY(-50%) rotate(45deg);
+    }
+    
+    &:nth-child(2) {
+      opacity: 0;
+    }
+    
+    &:nth-child(3) {
+      top: 50%;
+      transform: translateY(-50%) rotate(-45deg);
     }
   }
 `;
@@ -518,6 +530,84 @@ const ModalContainer = styled.div.attrs({
 const BudgetApp = () => {
   const { user, loading, signOut } = useAuth();
   
+  // 状態管理（すべてのHooksを最初に配置）
+  const [monthlyBudget, setMonthlyBudget] = useState(0);
+  const [currentBalance, setCurrentBalance] = useState(0);
+  const [expenseAmount, setExpenseAmount] = useState('');
+  const [budgetInput, setBudgetInput] = useState('');
+  const [selectedRadioButton, setSelectedRadioButton] = useState("食費");
+  const [jenre, setJenre] = useState('');
+  const [transactions, setTransactions] = useState([]);
+  const [monthlyHistory, setMonthlyHistory] = useState([]);
+  const [currentBudgetId, setCurrentBudgetId] = useState(null);
+  const [switchingButton, setSwitchingButton] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showExpenseForm, setShowExpenseForm] = useState(false);
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [budgetConfirmStep, setBudgetConfirmStep] = useState(false);
+
+  // useEffectも条件分岐の前に配置
+  useEffect(() => {
+    const getCurrentMonth = () => {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    };
+
+    const isBudgetSetForCurrentMonth = (latestBudget) => {
+      if (!latestBudget || !latestBudget.created_at) return false;
+      
+      const budgetDate = new Date(latestBudget.created_at);
+      const budgetMonth = `${budgetDate.getFullYear()}-${String(budgetDate.getMonth() + 1).padStart(2, '0')}`;
+      const currentMonth = getCurrentMonth();
+      
+      return budgetMonth === currentMonth;
+    };
+
+    const fetchInitialData = async () => {
+      try {
+        const { data: latestBudget, error: budgetError } = await getLatestBudget();
+        
+        if (budgetError) {
+          // Supabaseエラー時はモーダルを表示
+          setShowBudgetModal(true);
+          return;
+        }
+        
+        // 今月の予算が設定されているかチェック
+        if (latestBudget && isBudgetSetForCurrentMonth(latestBudget)) {
+          setMonthlyBudget(latestBudget.amount);
+          setCurrentBudgetId(latestBudget.id);
+          setTransactions(latestBudget.transactions || []);
+          setCurrentBalance(
+            latestBudget.amount -
+            (latestBudget.transactions || []).reduce((sum, t) => sum + t.amount, 0)
+          );
+        } else {
+          // 今月の予算が未設定の場合、モーダルを表示
+          setShowBudgetModal(true);
+        }
+
+        const { data: history } = await getBudgetHistory();
+        if (history && history.length > 0) {
+          setMonthlyHistory(history.slice(1));
+        }
+      } catch (error) {
+        // エラーは内部的に処理
+      }
+    };
+
+    fetchInitialData();
+
+    // Service Worker処理
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+  }, []);
+
   // 認証ローディング中の表示
   if (loading) {
     return (
@@ -541,29 +631,12 @@ const BudgetApp = () => {
     return <AuthPage />;
   }
 
-  // 状態管理
-  const [monthlyBudget, setMonthlyBudget] = useState(0);
-  const [currentBalance, setCurrentBalance] = useState(0);
-  const [expenseAmount, setExpenseAmount] = useState('');
-  const [budgetInput, setBudgetInput] = useState('');
-  const [selectedRadioButton, setSelectedRadioButton] = useState("食費");
-  const [jenre, setJenre] = useState('');
-  const [transactions, setTransactions] = useState([]);
-  const [monthlyHistory, setMonthlyHistory] = useState([]);
-  const [currentBudgetId, setCurrentBudgetId] = useState(null);
-  const [switchingButton, setSwitchingButton] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [showExpenseForm, setShowExpenseForm] = useState(false);
-  const [showBudgetModal, setShowBudgetModal] = useState(false);
-  const [budgetConfirmStep, setBudgetConfirmStep] = useState(false);
-
-  // 現在の月をチェックする関数
+  // ヘルパー関数を定義
   const getCurrentMonth = () => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   };
 
-  // 最新の予算が今月のものかチェックする関数
   const isBudgetSetForCurrentMonth = (latestBudget) => {
     if (!latestBudget || !latestBudget.created_at) return false;
     
@@ -574,18 +647,15 @@ const BudgetApp = () => {
     return budgetMonth === currentMonth;
   };
 
-  // 現在月の予算が設定済みかどうかをチェック
   const isCurrentMonthBudgetSet = () => {
     return monthlyBudget > 0 && currentBudgetId;
   };
 
-  // ジャンルを選択した時の制御
   const selectedJenres = (e) => {
     setSelectedRadioButton(e.target.value);
     setJenre(e.target.value);
-  }
+  };
 
-  // ジャンルごとの支出割合を計算
   const calculateGenrePercentages = () => {
     const totalExpense = transactions.reduce((sum, t) => sum + t.amount, 0);
     const genreTotals = transactions.reduce((acc, t) => {
@@ -599,38 +669,6 @@ const BudgetApp = () => {
       amount,
     }));
   };
-
-  // 初期データ読み込み
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const { data: latestBudget } = await getLatestBudget();
-        
-        // 今月の予算が設定されているかチェック
-        if (latestBudget && isBudgetSetForCurrentMonth(latestBudget)) {
-          setMonthlyBudget(latestBudget.amount);
-          setCurrentBudgetId(latestBudget.id);
-          setTransactions(latestBudget.transactions || []);
-          setCurrentBalance(
-            latestBudget.amount -
-            (latestBudget.transactions || []).reduce((sum, t) => sum + t.amount, 0)
-          );
-        } else {
-          // 今月の予算が未設定の場合、モーダルを表示
-          setShowBudgetModal(true);
-        }
-
-        const { data: history } = await getBudgetHistory();
-        if (history && history.length > 0) {
-          setMonthlyHistory(history.slice(1));
-        }
-      } catch (error) {
-        console.error('初期データ取得エラー:', error);
-      }
-    };
-
-    fetchInitialData();
-  }, []);
 
   // 月次予算設定モーダルの処理
   const handleBudgetModalSubmit = () => {
@@ -647,7 +685,12 @@ const BudgetApp = () => {
       };
 
       try {
-        const { data } = await createNewBudget(newBudget);
+        const { data, error } = await createNewBudget(newBudget);
+        if (error) {
+          alert('予算設定に失敗しました。もう一度お試しください。');
+          return;
+        }
+        
         if (data) {
           if (monthlyBudget > 0) {
             setMonthlyHistory([
@@ -668,7 +711,8 @@ const BudgetApp = () => {
           setBudgetConfirmStep(false);
         }
       } catch (error) {
-        console.error('予算設定エラー:', error);
+        console.error('Unexpected error:', error);
+        alert('予算の設定中にエラーが発生しました。');
       }
     }
   };
@@ -681,14 +725,19 @@ const BudgetApp = () => {
   // 旧予算設定（ハンバーガーメニュー用）
   const handleSetBudget = async (e) => {
     e.preventDefault();
-    if (budgetInput && !isNaN(budgetInput)) {
+    if (budgetInput && !isNaN(budgetInput) && parseFloat(budgetInput) > 0) {
       const newBudget = {
         amount: parseFloat(budgetInput),
         transactions: []
       };
 
       try {
-        const { data } = await createNewBudget(newBudget);
+        const { data, error } = await createNewBudget(newBudget);
+        if (error) {
+          alert('予算設定に失敗しました。もう一度お試しください。');
+          return;
+        }
+        
         if (data) {
           if (monthlyBudget > 0) {
             setMonthlyHistory([
@@ -705,9 +754,11 @@ const BudgetApp = () => {
           setCurrentBalance(data.amount);
           setTransactions([]);
           setBudgetInput('');
+          setMenuOpen(false); // メニューを閉じる
         }
       } catch (error) {
-        console.error('予算設定エラー:', error);
+        console.error('Unexpected error:', error);
+        alert('予算の設定中にエラーが発生しました。');
       }
     }
   };
@@ -738,7 +789,7 @@ const BudgetApp = () => {
           setExpenseAmount('');
         }
       } catch (error) {
-        console.error('支出記録エラー:', error);
+        // エラーは内部的に処理
       }
     }
   };
@@ -746,14 +797,14 @@ const BudgetApp = () => {
   // データの削除
   const deleteTransactionByIndex = async (index) => {
     if (!currentBudgetId) {
-      console.error("現在の予算IDがありません");
+      // console.error("現在の予算IDがありません");
       return;
     }
 
     try {
       const { data: budget, error: fetchError } = await getLatestBudget();
       if (fetchError) {
-        console.error("取引データの取得に失敗しました:", fetchError);
+        // console.error("取引データの取得に失敗しました:", fetchError);
         return;
       }
 
@@ -761,7 +812,7 @@ const BudgetApp = () => {
 
       const { error: updateError } = await updateBudgetTransactions(currentBudgetId, updatedTransactions);
       if (updateError) {
-        console.error("取引データの更新に失敗しました:", updateError);
+        // console.error("取引データの更新に失敗しました:", updateError);
         return;
       }
 
@@ -774,34 +825,11 @@ const BudgetApp = () => {
         setMonthlyHistory(updatedHistory.slice(1));
       }
     } catch (error) {
-      console.error("取引削除中にエラーが発生しました:", error);
+      // console.error("取引削除中にエラーが発生しました:", error);
     }
   };
 
-  // Service Workerを管理する
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(registrations => {
-        for (let registration of registrations) {
-          registration.unregister();
-        }
-      });
-    }
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        const swUrl = `${window.location.origin}/service-worker.js`;
-        navigator.serviceWorker
-          .register(swUrl)
-          .then(registration => {
-            console.log('Service Worker登録成功:', registration);
-          })
-          .catch(error => {
-            console.error('Service Worker登録失敗:', error);
-          });
-      });
-    }
-  }, []);
+  // Service Worker処理をメインのuseEffectに統合済み
 
   return (
     <AppContainer>
@@ -815,7 +843,7 @@ const BudgetApp = () => {
           </UserInfo>
           
           <HamburgerButton onClick={() => setMenuOpen(!menuOpen)}>
-            <HamburgerIcon isOpen={menuOpen}>
+            <HamburgerIcon className={menuOpen ? 'open' : ''}>
               <div className="line"></div>
               <div className="line"></div>
               <div className="line"></div>
@@ -913,6 +941,7 @@ const BudgetApp = () => {
             ) : (
               <BudgetSettingButton
                 onClick={() => {
+                  setBudgetInput(''); // モーダルを開く前にリセット
                   setShowBudgetModal(true);
                   setMenuOpen(false);
                 }}

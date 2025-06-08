@@ -156,7 +156,13 @@ const WarningText = styled.p`
   line-height: 1.5;
 `;
 
-const BudgetSetting = ({
+interface BudgetSettingProps {
+  budgetInput: string;
+  setBudgetInput: (value: string) => void;
+  handleSetBudget: (e: React.FormEvent) => void;
+}
+
+const BudgetSetting: React.FC<BudgetSettingProps> = ({
   budgetInput,
   setBudgetInput,
   handleSetBudget,
@@ -173,9 +179,12 @@ const BudgetSetting = ({
           {presetAmounts.map((amount) => (
             <PresetButton
               key={amount}
-              onClick={() => setBudgetInput(amount.toString())}
+              onClick={() => {
+                const currentValue = parseFloat(budgetInput) || 0;
+                setBudgetInput((currentValue + amount).toString());
+              }}
             >
-              ¥{amount.toLocaleString()}
+              +¥{amount.toLocaleString()}
             </PresetButton>
           ))}
         </PresetGrid>
@@ -194,7 +203,7 @@ const BudgetSetting = ({
           </InputWrapper>
           <SetButton
             onClick={handleSetBudget}
-            disabled={!budgetInput || budgetInput <= 0}
+            disabled={!budgetInput || Number(budgetInput) <= 0}
           >
             設定する
           </SetButton>

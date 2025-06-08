@@ -337,9 +337,12 @@ const ExpenseInput = ({
               {[100, 500, 1000, 3000].map((amount) => (
                 <QuickAmountButton
                   key={amount}
-                  onClick={() => setExpenseAmount(amount.toString())}
+                  onClick={() => {
+                    const currentValue = parseFloat(expenseAmount) || 0;
+                    setExpenseAmount((currentValue + amount).toString());
+                  }}
                 >
-                  ¥{amount.toLocaleString()}
+                  +¥{amount.toLocaleString()}
                 </QuickAmountButton>
               ))}
             </QuickAmountGrid>

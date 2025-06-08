@@ -18,7 +18,7 @@ type Budget = {
 export const getAllData = async (table: string) => {
   const { data, error } = await supabase.from(table).select("*");
   if (error) {
-    console.error("Error fetching data:", error);
+    // エラーは内部で処理"Error fetching data:", error);
     return { data: [], error };
   }
   return { data, error };
@@ -28,12 +28,7 @@ export const addData = async (table: string, newData: any) => {
   const { data, error } = await supabase.from(table).insert(newData);
 
   if (error) {
-    console.error(
-      "Error adding data:",
-      error.message,
-      error.details,
-      error.hint
-    );
+    // エラーは内部で処理
     return null;
   }
 
@@ -59,7 +54,7 @@ export const getLatestBudget = async () => {
 
     return { data, error: null };
   } catch (error) {
-    console.error("Error fetching latest budget:", error);
+    // エラーは内部で処理"Error fetching latest budget:", error);
     return { data: null, error };
   }
 };
@@ -73,21 +68,21 @@ export const createNewBudget = async (budget: Budget) => {
 
     // user_idを追加してbudgetを作成
     const budgetWithUserId = {
-      ...budget,
+      amount: budget.amount,
+      transactions: budget.transactions || [],
       user_id: user.id
     };
 
     const { data, error } = await supabase
       .from("budget_book")
-      .insert(budgetWithUserId)
+      .insert([budgetWithUserId])
       .select()
-      .maybeSingle();
+      .single();
 
     if (error) throw error;
 
     return { data, error: null };
   } catch (error) {
-    console.error("Error creating budget:", error);
     return { data: null, error };
   }
 };
@@ -114,7 +109,7 @@ export const updateBudgetTransactions = async (
 
     return { data, error: null };
   } catch (error) {
-    console.error("Error updating transactions:", error);
+    // エラーは内部で処理"Error updating transactions:", error);
     return { data: null, error };
   }
 };
@@ -142,7 +137,7 @@ export const getBudgetHistory = async () => {
       error: null,
     };
   } catch (error) {
-    console.error("Error fetching budget history:", error);
+    // エラーは内部で処理"Error fetching budget history:", error);
     return { data: [], error };
   }
 };
@@ -160,7 +155,7 @@ export const getBudgetHistory = async () => {
 //       .single();
 
 //     if (fetchError) {
-//       console.error("Error fetching budget:", fetchError);
+//       // エラーは内部で処理"Error fetching budget:", fetchError);
 //       return { success: false, error: fetchError };
 //     }
 
@@ -176,13 +171,13 @@ export const getBudgetHistory = async () => {
 //       .eq("id", budgetId);
 
 //     if (updateError) {
-//       console.error("Error updating transactions:", updateError);
+//       // エラーは内部で処理"Error updating transactions:", updateError);
 //       return { success: false, error: updateError };
 //     }
 
 //     return { success: true, error: null };
 //   } catch (error) {
-//     console.error("Unexpected error:", error);
+//     // エラーは内部で処理"Unexpected error:", error);
 //     return { success: false, error };
 //   }
 // };
