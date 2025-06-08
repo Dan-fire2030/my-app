@@ -21,9 +21,9 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: 'pkce',
+    flowType: 'implicit', // PKCEからimplicitに変更
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-    debug: process.env.NODE_ENV === 'development'
+    debug: true // デバッグモードを有効化
   },
   global: {
     headers: {
