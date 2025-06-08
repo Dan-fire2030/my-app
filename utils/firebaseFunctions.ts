@@ -38,14 +38,46 @@ export const getLatestBudget = async () => {
     if (!user) throw new Error('User not authenticated');
 
     const budgetsRef = collection(db, 'budget_book');
-    const q = query(
-      budgetsRef, 
-      where('user_id', '==', user.uid),
-      orderBy('created_at', 'desc'),
-      limit(1)
-    );
     
-    const querySnapshot = await getDocs(q);
+    // エラーハンドリングを改善
+    try {
+      const q = query(
+        budgetsRef, 
+        where('user_id', '==', user.uid),
+        orderBy('created_at', 'desc'),
+        limit(1)
+      );
+      
+      const querySnapshot = await getDocs(q);
+    } catch (queryError: any) {
+      console.error('Firestore query error:', queryError);
+      
+      // インデックスエラーの場合は、orderByなしで再試行
+      if (queryError.code === 'failed-precondition' || queryError.code === 'permission-denied') {
+        console.log('Retrying without orderBy...');
+        const simpleQuery = query(
+          budgetsRef,
+          where('user_id', '==', user.uid)
+        );
+        const querySnapshot = await getDocs(simpleQuery);
+        
+        // 手動でソート
+        if (!querySnapshot.empty) {
+          const docs = querySnapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .sort((a: any, b: any) => {
+              const aTime = a.created_at?.toMillis ? a.created_at.toMillis() : 0;
+              const bTime = b.created_at?.toMillis ? b.created_at.toMillis() : 0;
+              return bTime - aTime;
+            });
+          
+          const latestDoc = docs[0];
+          return { data: latestDoc, error: null };
+        }
+      }
+      throw queryError;
+    }
+    
     
     if (querySnapshot.empty) {
       return { data: null, error: null };
@@ -158,13 +190,32 @@ export const getBudgetHistory = async () => {
     if (!user) throw new Error('User not authenticated');
 
     const budgetsRef = collection(db, 'budget_book');
-    const q = query(
-      budgetsRef,
-      where('user_id', '==', user.uid),
-      orderBy('created_at', 'desc')
-    );
     
-    const querySnapshot = await getDocs(q);
+    // エラーハンドリングを改善
+    let querySnapshot;
+    try {
+      const q = query(
+        budgetsRef,
+        where('user_id', '==', user.uid),
+        orderBy('created_at', 'desc')
+      );
+      
+      querySnapshot = await getDocs(q);
+    } catch (queryError: any) {
+      console.error('Firestore query error in getBudgetHistory:', queryError);
+      
+      // インデックスエラーの場合は、orderByなしで再試行
+      if (queryError.code === 'failed-precondition' || queryError.code === 'permission-denied') {
+        console.log('Retrying without orderBy...');
+        const simpleQuery = query(
+          budgetsRef,
+          where('user_id', '==', user.uid)
+        );
+        querySnapshot = await getDocs(simpleQuery);
+      } else {
+        throw queryError;
+      }
+    }
     const budgets = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()

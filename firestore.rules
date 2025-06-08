@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // budget_bookコレクションのルール
+    match /budget_book/{document} {
+      // 認証されたユーザーのみアクセス可能
+      allow read: if request.auth != null && 
+        (request.auth.uid == resource.data.user_id || 
+         !exists(/databases/$(database)/documents/budget_book/$(document)));
+      
+      // 作成時は自分のuser_idが必須
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.user_id &&
+        request.resource.data.keys().hasAll(['user_id', 'amount', 'transactions']);
+      
+      // 更新は自分のデータのみ
+      allow update: if request.auth != null && 
+        request.auth.uid == resource.data.user_id &&
+        request.auth.uid == request.resource.data.user_id;
+      
+      // 削除は自分のデータのみ
+      allow delete: if request.auth != null && 
+        request.auth.uid == resource.data.user_id;
+    }
+  }
+}
