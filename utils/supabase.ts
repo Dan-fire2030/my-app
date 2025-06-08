@@ -44,13 +44,34 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
         // URLを文字列に変換
         const urlString = url instanceof URL ? url.toString() : String(url);
         
-        // オプションの検証
+        // ヘッダーを正しい形式に変換
+        const headers = new Headers();
+        if (options.headers) {
+          // HeadersInitの各種形式に対応
+          if (options.headers instanceof Headers) {
+            options.headers.forEach((value, key) => {
+              headers.append(key, value);
+            });
+          } else if (Array.isArray(options.headers)) {
+            options.headers.forEach(([key, value]) => {
+              headers.append(key, value);
+            });
+          } else if (typeof options.headers === 'object') {
+            Object.entries(options.headers).forEach(([key, value]) => {
+              if (value !== undefined && value !== null) {
+                headers.append(key, String(value));
+              }
+            });
+          }
+        }
+        
+        // オプションの再構築
         const validOptions = {
           ...options,
-          headers: options?.headers || {}
+          headers: headers
         };
         
-        console.log('Calling native fetch with:', urlString);
+        console.log('Calling native fetch with valid options');
         return await window.fetch(urlString, validOptions);
       } catch (error) {
         console.error('Fetch error details:', {
