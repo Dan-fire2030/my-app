@@ -3,44 +3,24 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from '../types/database';
 
 // 環境変数の取得
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-
-// デバッグ用ログ
-console.log('Supabase URL:', supabaseUrl);
-console.log('Supabase Anon Key exists:', !!supabaseAnonKey);
-console.log('Current origin:', window.location.origin);
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // 環境変数の存在チェック
-if (!supabaseUrl) {
-  throw new Error('VITE_SUPABASE_URL environment variable is missing. Please set it in Vercel Environment Variables.');
+if (!supabaseUrl || supabaseUrl === 'undefined') {
+  throw new Error('VITE_SUPABASE_URL is not set');
 }
 
-if (!supabaseAnonKey) {
-  throw new Error('VITE_SUPABASE_ANON_KEY environment variable is missing. Please set it in Vercel Environment Variables.');
+if (!supabaseAnonKey || supabaseAnonKey === 'undefined') {
+  throw new Error('VITE_SUPABASE_ANON_KEY is not set');
 }
 
+// URLの検証
+const cleanUrl = supabaseUrl.toString().trim();
+const cleanKey = supabaseAnonKey.toString().trim();
 
-// URLとキーの検証
-console.log('Supabase URL format check:', supabaseUrl);
-console.log('URL is valid:', supabaseUrl.startsWith('https://'));
-console.log('Anon key length:', supabaseAnonKey.length);
+console.log('Initializing Supabase client...');
+console.log('URL valid:', cleanUrl.startsWith('https://'));
 
-// Supabaseクライアントの作成（fetchエラー修正版）
-const supabase = createClient<Database>(
-  supabaseUrl.trim(), // 空白を削除
-  supabaseAnonKey.trim(), // 空白を削除
-  {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-      flowType: 'implicit', // implicitフローに変更
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-    }
-  }
-);
-
-console.log('Supabase client created successfully');
-
-export { supabase };
+// 最もシンプルな設定でクライアントを作成
+export const supabase = createClient<Database>(cleanUrl, cleanKey);
