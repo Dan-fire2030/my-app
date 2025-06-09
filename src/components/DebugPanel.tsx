@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { auth, db } from '../../utils/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { manualDataCheck, checkFirestoreConnection } from '../utils/manualDataCheck';
+import { investigateDataSync, migrateDataToCurrentUser, createTestData } from '../utils/dataSync';
 
 const DebugContainer = styled.div`
   position: fixed;
@@ -86,6 +87,7 @@ const DebugPanel: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [debugInfo, setDebugInfo] = useState<any>({});
   const [firestoreData, setFirestoreData] = useState<any[]>([]);
+  const [investigationResult, setInvestigationResult] = useState<any>(null);
 
   const refreshDebugInfo = async () => {
     const user = auth.currentUser;
@@ -195,10 +197,44 @@ const DebugPanel: React.FC = () => {
         <InfoItem><strong>User Agent:</strong> {navigator.userAgent.substring(0, 50)}...</InfoItem>
       </InfoSection>
       
+      {investigationResult && (
+        <InfoSection>
+          <InfoTitle>🔍 Investigation Results</InfoTitle>
+          <InfoItem><strong>Total Docs:</strong> {investigationResult.totalDocs}</InfoItem>
+          <InfoItem><strong>User Docs:</strong> {investigationResult.userDocuments?.length || 0}</InfoItem>
+          <InfoItem><strong>Query Results:</strong> {investigationResult.userQueryResults}</InfoItem>
+          
+          {investigationResult.allDocuments?.length > 0 && (
+            <InfoItem>
+              <strong>All User IDs found:</strong>
+              {Array.from(new Set(investigationResult.allDocuments.map((doc: any) => doc.user_id))).map((uid: any) => (
+                <div key={uid} style={{ marginLeft: '10px', fontSize: '10px' }}>
+                  {uid.substring(0, 10)}... 
+                  {uid === auth.currentUser?.uid ? ' (YOU)' : ''}
+                  {uid !== auth.currentUser?.uid && (
+                    <ActionButton 
+                      onClick={() => migrateDataToCurrentUser(uid)}
+                      style={{ marginLeft: '5px', fontSize: '8px', padding: '2px 5px' }}
+                    >
+                      Migrate
+                    </ActionButton>
+                  )}
+                </div>
+              ))}
+            </InfoItem>
+          )}
+        </InfoSection>
+      )}
+
       <InfoSection>
         <ActionButton onClick={refreshDebugInfo}>🔄 Refresh</ActionButton>
         <ActionButton onClick={copyToClipboard}>📋 Copy Debug Info</ActionButton>
         <ActionButton onClick={manualDataCheck}>🔍 Manual Data Check</ActionButton>
+        <ActionButton onClick={async () => {
+          const result = await investigateDataSync();
+          setInvestigationResult(result);
+        }}>🕵️ Deep Investigation</ActionButton>
+        <ActionButton onClick={createTestData}>🧪 Create Test Data</ActionButton>
         <ActionButton onClick={checkFirestoreConnection}>🌐 Test Connection</ActionButton>
         <ActionButton onClick={clearLocalData} style={{ background: '#ef4444' }}>
           🗑️ Clear Local Data
