@@ -583,11 +583,30 @@ const BudgetApp = () => {
     };
 
     const isBudgetSetForCurrentMonth = (latestBudget) => {
-      if (!latestBudget || !latestBudget.created_at) return false;
+      if (!latestBudget || !latestBudget.created_at) {
+        console.log('📅 No budget or created_at field');
+        return false;
+      }
 
-      const budgetDate = new Date(latestBudget.created_at);
+      // Firestoreのタイムスタンプを処理
+      let budgetDate;
+      if (latestBudget.created_at.toDate) {
+        budgetDate = latestBudget.created_at.toDate();
+      } else if (latestBudget.created_at instanceof Date) {
+        budgetDate = latestBudget.created_at;
+      } else {
+        budgetDate = new Date(latestBudget.created_at);
+      }
+
       const budgetMonth = `${budgetDate.getFullYear()}-${String(budgetDate.getMonth() + 1).padStart(2, '0')}`;
       const currentMonth = getCurrentMonth();
+
+      console.log('📅 Date comparison:', {
+        budgetDate: budgetDate.toISOString(),
+        budgetMonth,
+        currentMonth,
+        matches: budgetMonth === currentMonth
+      });
 
       return budgetMonth === currentMonth;
     };
@@ -602,23 +621,45 @@ const BudgetApp = () => {
       try {
         const { data: latestBudget, error: budgetError } = await getLatestBudget();
 
+        console.log('🔍 getLatestBudget result:', { latestBudget, budgetError });
+
         if (budgetError) {
-          // Supabaseエラー時はモーダルを表示
+          console.error('❌ Budget error:', budgetError);
           setShowBudgetModal(true);
           return;
         }
 
-        // 今月の予算が設定されているかチェック
-        if (latestBudget && isBudgetSetForCurrentMonth(latestBudget)) {
-          setMonthlyBudget(latestBudget.amount);
-          setCurrentBudgetId(latestBudget.id);
-          setTransactions(latestBudget.transactions || []);
-          setCurrentBalance(
-            latestBudget.amount -
-            (latestBudget.transactions || []).reduce((sum, t) => sum + t.amount, 0)
-          );
+        if (latestBudget) {
+          console.log('✅ Latest budget found:', {
+            id: latestBudget.id,
+            amount: latestBudget.amount,
+            transactions: latestBudget.transactions?.length || 0,
+            created_at: latestBudget.created_at
+          });
+
+          // 今月の予算が設定されているかチェック
+          const isCurrentMonth = isBudgetSetForCurrentMonth(latestBudget);
+          console.log('📅 Is current month budget?', isCurrentMonth);
+
+          if (isCurrentMonth) {
+            console.log('🎯 Setting budget data to state...');
+            setMonthlyBudget(latestBudget.amount);
+            setCurrentBudgetId(latestBudget.id);
+            setTransactions(latestBudget.transactions || []);
+            const balance = latestBudget.amount - (latestBudget.transactions || []).reduce((sum, t) => sum + t.amount, 0);
+            setCurrentBalance(balance);
+            console.log('💰 State updated:', {
+              monthlyBudget: latestBudget.amount,
+              currentBudgetId: latestBudget.id,
+              transactions: latestBudget.transactions?.length || 0,
+              currentBalance: balance
+            });
+          } else {
+            console.log('📅 Budget is not for current month, showing modal');
+            setShowBudgetModal(true);
+          }
         } else {
-          // 今月の予算が未設定の場合、モーダルを表示
+          console.log('❌ No budget data found, showing modal');
           setShowBudgetModal(true);
         }
 

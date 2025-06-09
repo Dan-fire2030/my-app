@@ -4,6 +4,7 @@ import { auth, db } from '../../utils/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { manualDataCheck, checkFirestoreConnection } from '../utils/manualDataCheck';
 import { investigateDataSync, migrateDataToCurrentUser, createTestData } from '../utils/dataSync';
+import { forceLoadUserData } from '../utils/forceDataLoad';
 
 const DebugContainer = styled.div`
   position: fixed;
@@ -235,6 +236,7 @@ const DebugPanel: React.FC = () => {
           setInvestigationResult(result);
         }}>🕵️ Deep Investigation</ActionButton>
         <ActionButton onClick={createTestData}>🧪 Create Test Data</ActionButton>
+        <ActionButton onClick={forceLoadUserData}>🔄 Force Load Data</ActionButton>
         <ActionButton onClick={checkFirestoreConnection}>🌐 Test Connection</ActionButton>
         <ActionButton onClick={clearLocalData} style={{ background: '#ef4444' }}>
           🗑️ Clear Local Data
