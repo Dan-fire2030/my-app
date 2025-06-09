@@ -46,6 +46,20 @@ export const getLatestBudget = async () => {
       displayName: user.displayName
     });
 
+    // 全てのドキュメントを取得してデバッグ
+    console.log('Debug: Fetching ALL budget documents for debugging...');
+    const allBudgetsSnapshot = await getDocs(collection(db, 'budget_book'));
+    console.log('Debug: Total documents in budget_book:', allBudgetsSnapshot.size);
+    allBudgetsSnapshot.forEach(doc => {
+      const data = doc.data();
+      console.log('Debug: Document', doc.id, {
+        user_id: data.user_id,
+        amount: data.amount,
+        created_at: data.created_at,
+        matches_current_user: data.user_id === user.uid
+      });
+    });
+
     const budgetsRef = collection(db, 'budget_book');
     
     // エラーハンドリングを改善

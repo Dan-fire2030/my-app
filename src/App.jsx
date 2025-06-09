@@ -16,6 +16,7 @@ import MonthlyHistory from './components/MonthlyHistory';
 import RemainingAmountMeter from './components/RemainingAmountMeter';
 import GenreBreakdown from './components/GenreBreakdown';
 import AuthPage from './components/AuthPage';
+import DebugPanel from './components/DebugPanel';
 import { useAuth } from './contexts/FirebaseAuthContext';
 import { debugAllAuth } from './utils/debugAuth';
 
@@ -1087,6 +1088,9 @@ const BudgetApp = () => {
             )}
           </BudgetSetupContent>
         </BudgetSetupModal>
+      
+      {/* デバッグパネル（開発時のみ表示） */}
+      <DebugPanel />
       </MainContainer>
     </AppContainer>
   );
