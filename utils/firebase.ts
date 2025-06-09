@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 
 // Firebase設定
@@ -34,7 +34,29 @@ googleProvider.addScope('profile');
 
 console.log('Firebase initialized successfully:', {
   projectId: firebaseConfig.projectId,
+  authDomain: firebaseConfig.authDomain,
   hasAuth: !!auth,
   hasFirestore: !!db,
-  hasAnalytics: !!analytics
+  hasAnalytics: !!analytics,
+  timestamp: new Date().toISOString()
+});
+
+// 認証の永続性を設定
+auth.setPersistence('local').then(() => {
+  console.log('Firebase Auth: Persistence set to LOCAL');
+}).catch((error) => {
+  console.error('Firebase Auth: Failed to set persistence:', error);
+});
+
+// Firestoreのオフライン永続化を有効化
+enableIndexedDbPersistence(db).then(() => {
+  console.log('Firestore: Offline persistence enabled');
+}).catch((err) => {
+  if (err.code === 'failed-precondition') {
+    console.warn('Firestore: Multiple tabs open, persistence can only be enabled in one tab at a time.');
+  } else if (err.code === 'unimplemented') {
+    console.warn('Firestore: The current browser does not support offline persistence');
+  } else {
+    console.error('Firestore: Error enabling offline persistence:', err);
+  }
 });

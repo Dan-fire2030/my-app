@@ -17,6 +17,7 @@ import RemainingAmountMeter from './components/RemainingAmountMeter';
 import GenreBreakdown from './components/GenreBreakdown';
 import AuthPage from './components/AuthPage';
 import { useAuth } from './contexts/FirebaseAuthContext';
+import { debugAllAuth } from './utils/debugAuth';
 
 // URLパラメータをログ出力（認証コールバックのデバッグ用）
 if (typeof window !== 'undefined') {
@@ -635,10 +636,13 @@ const BudgetApp = () => {
     // ユーザーがログインしている場合のみデータを取得
     if (user) {
       console.log('useEffect: User authenticated, fetching data...');
-      // 少し遅延を入れて、Firebaseの認証状態が完全に同期されるのを待つ
-      setTimeout(() => {
-        fetchInitialData();
-      }, 500);
+      // デバッグ情報を出力
+      debugAllAuth().then(() => {
+        // 少し遅延を入れて、Firebaseの認証状態が完全に同期されるのを待つ
+        setTimeout(() => {
+          fetchInitialData();
+        }, 500);
+      });
     } else {
       console.log('useEffect: No user authenticated');
     }

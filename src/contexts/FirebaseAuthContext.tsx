@@ -43,7 +43,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log('Firebase Auth: State changed:', { 
         hasUser: !!user, 
         email: user?.email,
-        uid: user?.uid 
+        uid: user?.uid,
+        displayName: user?.displayName,
+        providerId: user?.providerData?.[0]?.providerId,
+        timestamp: new Date().toISOString()
       });
       
       setUser(user);
@@ -67,7 +70,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signIn = async (email: string, password: string) => {
     try {
       console.log('Firebase Auth: Sign in attempt for:', email);
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Sign in successful:', { 
+        uid: userCredential.user.uid, 
+        email: userCredential.user.email,
+        method: 'email/password',
+        timestamp: new Date().toISOString()
+      });
       return { error: undefined };
     } catch (err: any) {
       console.error('Firebase Auth: Sign in error:', err);
@@ -78,8 +87,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signInWithGoogle = async () => {
     try {
       console.log('Firebase Auth: Google sign in attempt');
-      await signInWithPopup(auth, googleProvider);
-      console.log('Firebase Auth: Google sign in successful');
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log('Firebase Auth: Google sign in successful:', { 
+        uid: result.user.uid, 
+        email: result.user.email,
+        displayName: result.user.displayName,
+        photoURL: result.user.photoURL,
+        providerId: result.user.providerData?.[0]?.providerId,
+        method: 'google.com',
+        timestamp: new Date().toISOString()
+      });
       return { error: undefined };
     } catch (err: any) {
       console.error('Firebase Auth: Google sign in error:', err);
