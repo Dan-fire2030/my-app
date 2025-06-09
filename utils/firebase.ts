@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider, browserLocalPersistence, setPersistence } from 'firebase/auth';
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 
 // Firebase設定
@@ -21,8 +21,12 @@ const app = initializeApp(firebaseConfig);
 // Auth インスタンス
 export const auth = getAuth(app);
 
-// Firestore インスタンス  
-export const db = getFirestore(app);
+// Firestore インスタンス（新しいAPIで永続化を設定）
+export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager()
+  })
+});
 
 // Analytics インスタンス（ブラウザ環境でのみ）
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
@@ -42,21 +46,11 @@ console.log('Firebase initialized successfully:', {
 });
 
 // 認証の永続性を設定
-auth.setPersistence('local').then(() => {
+setPersistence(auth, browserLocalPersistence).then(() => {
   console.log('Firebase Auth: Persistence set to LOCAL');
 }).catch((error) => {
   console.error('Firebase Auth: Failed to set persistence:', error);
 });
 
-// Firestoreのオフライン永続化を有効化
-enableIndexedDbPersistence(db).then(() => {
-  console.log('Firestore: Offline persistence enabled');
-}).catch((err) => {
-  if (err.code === 'failed-precondition') {
-    console.warn('Firestore: Multiple tabs open, persistence can only be enabled in one tab at a time.');
-  } else if (err.code === 'unimplemented') {
-    console.warn('Firestore: The current browser does not support offline persistence');
-  } else {
-    console.error('Firestore: Error enabling offline persistence:', err);
-  }
-});
+// Firestoreのオフライン永続化は initializeFirestore で設定済み
+console.log('Firestore: Offline persistence enabled with new API');

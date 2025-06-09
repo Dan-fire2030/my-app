@@ -49,6 +49,7 @@ export const getLatestBudget = async () => {
     const budgetsRef = collection(db, 'budget_book');
     
     // エラーハンドリングを改善
+    let querySnapshot;
     try {
       const q = query(
         budgetsRef, 
@@ -57,7 +58,7 @@ export const getLatestBudget = async () => {
         limit(1)
       );
       
-      const querySnapshot = await getDocs(q);
+      querySnapshot = await getDocs(q);
     } catch (queryError: any) {
       console.error('Firestore query error:', queryError);
       
@@ -68,7 +69,7 @@ export const getLatestBudget = async () => {
           budgetsRef,
           where('user_id', '==', user.uid)
         );
-        const querySnapshot = await getDocs(simpleQuery);
+        querySnapshot = await getDocs(simpleQuery);
         
         // 手動でソート
         if (!querySnapshot.empty) {
@@ -83,12 +84,12 @@ export const getLatestBudget = async () => {
           const latestDoc = docs[0];
           return { data: latestDoc, error: null };
         }
+      } else {
+        throw queryError;
       }
-      throw queryError;
     }
     
-    
-    if (querySnapshot.empty) {
+    if (!querySnapshot || querySnapshot.empty) {
       return { data: null, error: null };
     }
 
