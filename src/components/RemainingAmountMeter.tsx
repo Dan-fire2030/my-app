@@ -234,11 +234,11 @@ const RemainingAmountMeter = ({ currentBalance, monthlyBudget, onAddExpense, sho
 
       <Legend>
         <LegendItem>
-          <LegendDot color="#e5e7eb" />
+          <LegendDot color={getStatusColor()} />
           <LegendLabel>使用済み</LegendLabel>
         </LegendItem>
         <LegendItem>
-          <LegendDot color={getStatusColor()} />
+          <LegendDot color="#e5e7eb" />
           <LegendLabel>残り</LegendLabel>
         </LegendItem>
       </Legend>
