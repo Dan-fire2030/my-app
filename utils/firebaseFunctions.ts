@@ -35,7 +35,16 @@ export const getLatestBudget = async () => {
   try {
     // 現在のユーザーを取得
     const user = auth.currentUser;
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      console.error('getLatestBudget: No authenticated user');
+      throw new Error('User not authenticated');
+    }
+    
+    console.log('getLatestBudget: Fetching for user:', {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName
+    });
 
     const budgetsRef = collection(db, 'budget_book');
     
@@ -102,11 +111,15 @@ export const createNewBudget = async (budget: Budget) => {
     // 現在のユーザーを取得
     const user = auth.currentUser;
     if (!user) {
-      console.error('User not authenticated');
+      console.error('createNewBudget: No authenticated user');
       throw new Error('User not authenticated');
     }
 
-    console.log('Creating budget for user:', user.uid);
+    console.log('createNewBudget: Creating for user:', {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName
+    });
     console.log('Budget data:', budget);
 
     // Firestoreに保存するデータ
@@ -131,7 +144,11 @@ export const createNewBudget = async (budget: Budget) => {
       ...createdDoc.data()
     };
 
-    console.log('Budget created successfully:', createdData);
+    console.log('Budget created successfully:', {
+      id: createdData.id,
+      user_id: createdData.user_id,
+      amount: createdData.amount
+    });
     return { data: createdData, error: null };
   } catch (error) {
     console.error('Error creating budget:', error);
@@ -147,7 +164,12 @@ export const updateBudgetTransactions = async (
   try {
     // 現在のユーザーを取得
     const user = auth.currentUser;
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      console.error('updateBudgetTransactions: No authenticated user');
+      throw new Error('User not authenticated');
+    }
+    
+    console.log('updateBudgetTransactions: Updating for user:', user.uid, 'budgetId:', budgetId);
 
     const budgetRef = doc(db, 'budget_book', budgetId);
     
@@ -187,7 +209,12 @@ export const getBudgetHistory = async () => {
   try {
     // 現在のユーザーを取得
     const user = auth.currentUser;
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      console.error('getBudgetHistory: No authenticated user');
+      throw new Error('User not authenticated');
+    }
+    
+    console.log('getBudgetHistory: Fetching for user:', user.uid);
 
     const budgetsRef = collection(db, 'budget_book');
     

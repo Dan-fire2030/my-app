@@ -591,6 +591,12 @@ const BudgetApp = () => {
     };
 
     const fetchInitialData = async () => {
+      console.log('fetchInitialData: Starting for user:', {
+        uid: user?.uid,
+        email: user?.email,
+        displayName: user?.displayName
+      });
+      
       try {
         const { data: latestBudget, error: budgetError } = await getLatestBudget();
 
@@ -618,6 +624,7 @@ const BudgetApp = () => {
         if (history && history.length > 0) {
           setMonthlyHistory(history.slice(1));
         }
+        // eslint-disable-next-line no-unused-vars
       } catch (error) {
         // エラーは内部的に処理
       }
@@ -627,7 +634,13 @@ const BudgetApp = () => {
 
     // ユーザーがログインしている場合のみデータを取得
     if (user) {
-      fetchInitialData();
+      console.log('useEffect: User authenticated, fetching data...');
+      // 少し遅延を入れて、Firebaseの認証状態が完全に同期されるのを待つ
+      setTimeout(() => {
+        fetchInitialData();
+      }, 500);
+    } else {
+      console.log('useEffect: No user authenticated');
     }
 
     // Service Worker処理
@@ -810,6 +823,7 @@ const BudgetApp = () => {
           setCurrentBalance(newBalance);
           setExpenseAmount('');
         }
+        // eslint-disable-next-line no-unused-vars
       } catch (error) {
         // エラーは内部的に処理
       }
@@ -846,6 +860,7 @@ const BudgetApp = () => {
       if (updatedHistory && updatedHistory.length > 0) {
         setMonthlyHistory(updatedHistory.slice(1));
       }
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       // console.error("取引削除中にエラーが発生しました:", error);
     }

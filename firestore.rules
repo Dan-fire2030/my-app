@@ -4,14 +4,16 @@ service cloud.firestore {
     // budget_bookコレクションのルール
     match /budget_book/{document} {
       // 認証されたユーザーのみアクセス可能
+      // 読み取り：自分のデータのみ
       allow read: if request.auth != null && 
-        (request.auth.uid == resource.data.user_id || 
-         !exists(/databases/$(database)/documents/budget_book/$(document)));
+        request.auth.uid == resource.data.user_id;
       
       // 作成時は自分のuser_idが必須
       allow create: if request.auth != null && 
         request.auth.uid == request.resource.data.user_id &&
-        request.resource.data.keys().hasAll(['user_id', 'amount', 'transactions']);
+        request.resource.data.keys().hasAll(['user_id', 'amount', 'transactions']) &&
+        request.resource.data.amount is number &&
+        request.resource.data.transactions is list;
       
       // 更新は自分のデータのみ
       allow update: if request.auth != null && 
