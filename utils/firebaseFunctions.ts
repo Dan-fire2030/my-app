@@ -14,11 +14,15 @@ import {
   Timestamp
 } from 'firebase/firestore';
 
+type TransactionType = 'expense' | 'income';
+
 type Transaction = {
   amount: number;
   date: string;
   remainingBalance: number;
   jenre: string;
+  type: TransactionType;
+  note?: string;
 };
 
 type Budget = {

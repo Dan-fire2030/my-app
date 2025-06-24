@@ -192,10 +192,43 @@ const AuthPage = () => {
       }
       
       if (result.error) {
-        setError(result.error.message);
+        // Handle specific Firebase auth errors
+        const errorCode = result.error.code;
+        switch (errorCode) {
+          case 'auth/operation-not-allowed':
+            setError('この認証方法は有効化されていません。管理者にお問い合わせください。');
+            break;
+          case 'auth/user-not-found':
+            setError('このメールアドレスは登録されていません。新規登録をお試しください。');
+            break;
+          case 'auth/wrong-password':
+            setError('パスワードが正しくありません。もう一度お試しください。');
+            break;
+          case 'auth/invalid-credential':
+            setError('メールアドレスまたはパスワードが正しくありません。');
+            break;
+          case 'auth/too-many-requests':
+            setError('ログイン試行回数が多すぎます。しばらく時間をおいてからお試しください。');
+            break;
+          case 'auth/email-already-in-use':
+            setError('このメールアドレスは既に登録されています。ログインをお試しください。');
+            break;
+          case 'auth/weak-password':
+            setError('セキュリティのため、パスワードは6文字以上で設定してください。');
+            break;
+          case 'auth/invalid-email':
+            setError('正しいメールアドレスの形式で入力してください。');
+            break;
+          case 'auth/network-request-failed':
+            setError('ネットワークエラーが発生しました。インターネット接続を確認してください。');
+            break;
+          default:
+            setError('エラーが発生しました。しばらく時間をおいてからお試しください。');
+        }
       }
     } catch (err) {
-      setError('予期しないエラーが発生しました');
+      console.error('Auth error:', err);
+      setError('エラーが発生しました。しばらく時間をおいてからお試しください。');
     }
     
     setLoading(false);
@@ -210,11 +243,27 @@ const AuthPage = () => {
       const { error } = await signInWithGoogle();
       if (error) {
         console.error('Google sign in error:', error);
-        setError(error.message || 'Googleログインに失敗しました');
+        const errorCode = (error as any).code;
+        switch (errorCode) {
+          case 'auth/operation-not-allowed':
+            setError('Google認証が有効化されていません。Firebase Consoleで有効化してください。');
+            break;
+          case 'auth/popup-blocked':
+            setError('ポップアップがブロックされました。ポップアップを許可してください。');
+            break;
+          case 'auth/popup-closed-by-user':
+            setError('認証がキャンセルされました。');
+            break;
+          case 'auth/unauthorized-domain':
+            setError('このドメインは認証に許可されていません。');
+            break;
+          default:
+            setError('Googleログインに失敗しました。もう一度お試しください。');
+        }
       }
     } catch (err) {
-      console.error('Unexpected error in handleGoogleSignIn:', err);
-      setError('Googleログインに失敗しました。コンソールを確認してください。');
+      console.error('Google auth error:', err);
+      setError('Googleログインに失敗しました。もう一度お試しください。');
     }
     
     setLoading(false);

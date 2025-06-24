@@ -8,14 +8,15 @@ import {
   updateBudgetTransactions,
   getBudgetHistory
 } from '../utils/firebaseFunctions';
-import ExpenseInput from './components/ExpenseInput';
+import TransactionInput from './components/TransactionInput';
 import BudgetSetting from './components/BudgetSetting';
 import BalanceDisplay from './components/BalanceDisplay';
-import TransactionHistory from './components/TransactionHistory';
+import TransactionHistoryUpdated from './components/TransactionHistoryUpdated';
 import MonthlyHistory from './components/MonthlyHistory';
 import RemainingAmountMeter from './components/RemainingAmountMeter';
 import GenreBreakdown from './components/GenreBreakdown';
 import AuthPage from './components/AuthPage';
+import { CategoryManager } from './components/CategoryManager';
 import { useAuth } from './contexts/FirebaseAuthContext';
 
 // URLパラメータをログ出力（認証コールバックのデバッグ用）
@@ -644,7 +645,11 @@ const BudgetApp = () => {
             setMonthlyBudget(latestBudget.amount);
             setCurrentBudgetId(latestBudget.id);
             setTransactions(latestBudget.transactions || []);
-            const balance = latestBudget.amount - (latestBudget.transactions || []).reduce((sum, t) => sum + t.amount, 0);
+            // 収入と支出を分けて計算（legacy transactions without type field are treated as expenses）
+            const transactions = latestBudget.transactions || [];
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const totalExpense = transactions.filter(t => !t.type || t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const balance = latestBudget.amount + totalIncome - totalExpense;
             setCurrentBalance(balance);
             console.log('💰 State updated:', {
               monthlyBudget: latestBudget.amount,
@@ -733,8 +738,10 @@ const BudgetApp = () => {
   };
 
   const calculateGenrePercentages = () => {
-    const totalExpense = transactions.reduce((sum, t) => sum + t.amount, 0);
-    const genreTotals = transactions.reduce((acc, t) => {
+    // 支出のみを対象とする（legacy transactions without type field are treated as expenses）
+    const expenseTransactions = transactions.filter(t => !t.type || t.type === 'expense');
+    const totalExpense = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
+    const genreTotals = expenseTransactions.reduce((acc, t) => {
       acc[t.jenre] = (acc[t.jenre] || 0) + t.amount;
       return acc;
     }, {});
@@ -840,17 +847,21 @@ const BudgetApp = () => {
   };
 
   // 支出記録
-  const handleAddExpense = async (e) => {
+  const handleAddExpense = async (e, transactionType = 'expense', note = '') => {
     e.preventDefault();
     if (expenseAmount && !isNaN(expenseAmount) && currentBudgetId) {
-      const expense = parseFloat(expenseAmount);
-      const newBalance = currentBalance - expense;
+      const amount = parseFloat(expenseAmount);
+      // 収入の場合は残高を増やし、支出の場合は減らす
+      const balanceChange = transactionType === 'income' ? amount : -amount;
+      const newBalance = currentBalance + balanceChange;
 
       const newTransaction = {
-        amount: expense,
+        amount: amount,
         date: new Date().toLocaleDateString(),
         remainingBalance: newBalance,
         jenre: selectedRadioButton,
+        type: transactionType,
+        note: note
       };
 
       try {
@@ -894,7 +905,10 @@ const BudgetApp = () => {
       }
 
       setTransactions(updatedTransactions);
-      const newBalance = monthlyBudget - updatedTransactions.reduce((sum, t) => sum + t.amount, 0);
+      // 収入と支出を分けて計算（legacy transactions without type field are treated as expenses）
+      const totalIncome = updatedTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+      const totalExpense = updatedTransactions.filter(t => !t.type || t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+      const newBalance = monthlyBudget + totalIncome - totalExpense;
       setCurrentBalance(newBalance);
 
       const { data: updatedHistory } = await getBudgetHistory();
@@ -971,7 +985,7 @@ const BudgetApp = () => {
         />
         <ExpenseModal isOpen={showExpenseForm}>
           <ExpenseModalHeader>
-            <ExpenseModalTitle>支出を入力</ExpenseModalTitle>
+            <ExpenseModalTitle>収支を入力</ExpenseModalTitle>
             <CloseButton onClick={() => setShowExpenseForm(false)}>
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -979,15 +993,14 @@ const BudgetApp = () => {
             </CloseButton>
           </ExpenseModalHeader>
 
-          <ExpenseInput
+          <TransactionInput
             expenseAmount={expenseAmount}
             switchingButton={true}
             selectedRadioButton={selectedRadioButton}
-            setSelectedRadioButton={setSelectedRadioButton}
             setExpenseAmount={setExpenseAmount}
             setSwitchingButton={() => setShowExpenseForm(false)}
-            handleAddExpense={(e) => {
-              handleAddExpense(e);
+            handleAddExpense={(e, transactionType, note) => {
+              handleAddExpense(e, transactionType, note);
               setShowExpenseForm(false);
             }}
             selectedJenres={selectedJenres}
@@ -1009,6 +1022,11 @@ const BudgetApp = () => {
           </ModalHeader>
 
           <MenuContent>
+            {/* カテゴリー管理 */}
+            <CategoryManager onCategoryChange={() => {
+              // カテゴリーが変更された時の処理があればここに記述
+            }} />
+
             {/* 月次設定ボタン - 未設定時は通常のBudgetSetting、設定済み時はモーダル開くボタン */}
             {!isCurrentMonthBudgetSet() ? (
               <BudgetSetting
@@ -1031,11 +1049,9 @@ const BudgetApp = () => {
               </BudgetSettingButton>
             )}
 
-            <TransactionHistory
+            <TransactionHistoryUpdated
               transactions={transactions}
               deleteTransactionByIndex={deleteTransactionByIndex}
-              selectedRadioButton={selectedRadioButton}
-              jenre={jenre}
             />
 
             <MonthlyHistory
