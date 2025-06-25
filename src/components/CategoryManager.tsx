@@ -2,22 +2,24 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaPlus, FaTrash, FaTimes } from 'react-icons/fa';
 import { categoryService } from '../services/categoryService';
-import { Category } from '../utils/types';
+import { Category, TransactionType } from '../utils/types';
 import { useAuth } from '../contexts/FirebaseAuthContext';
 
 const Container = styled.div`
-  background: white;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 2px solid #FFD700;
   margin-bottom: 20px;
 `;
 
 const Title = styled.h2`
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 16px;
-  color: #333;
+  color: #FFD700;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 `;
 
 const CategoryList = styled.div`
@@ -32,14 +34,20 @@ const CategoryItem = styled.div<{ $color: string; $isDefault: boolean }>`
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: ${props => props.$color}20;
+  background: linear-gradient(135deg, ${props => props.$color}30, ${props => props.$color}10);
   border: 2px solid ${props => props.$color};
   border-radius: 20px;
   font-size: 14px;
   position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   
   ${props => !props.$isDefault && `
     padding-right: 36px;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transform: translateY(-1px);
+    }
     
     &:hover button {
       opacity: 1;
@@ -52,8 +60,9 @@ const CategoryIcon = styled.span`
 `;
 
 const CategoryName = styled.span`
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 `;
 
 const DeleteButton = styled.button`
@@ -61,16 +70,24 @@ const DeleteButton = styled.button`
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
-  border: none;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  border: 1px solid #ef4444;
+  border-radius: 50%;
   color: #ef4444;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
   padding: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
   &:hover {
-    color: #dc2626;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
   }
 `;
 
@@ -79,18 +96,21 @@ const AddButton = styled.button`
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: #f3f4f6;
-  border: 2px dashed #d1d5db;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  border: 2px dashed #FFD700;
   border-radius: 20px;
   font-size: 14px;
-  color: #6b7280;
+  color: #FFD700;
   cursor: pointer;
   transition: all 0.2s;
+  font-weight: 600;
   
   &:hover {
-    background: #e5e7eb;
-    border-color: #9ca3af;
-    color: #4b5563;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    border-color: #FFD700;
+    color: #000000;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    transform: translateY(-1px);
   }
 `;
 
@@ -100,7 +120,7 @@ const Modal = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -108,11 +128,13 @@ const Modal = styled.div`
 `;
 
 const ModalContent = styled.div`
-  background: white;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 12px;
   padding: 24px;
   width: 90%;
   max-width: 400px;
+  border: 2px solid #FFD700;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
 `;
 
 const ModalHeader = styled.div`
@@ -124,19 +146,29 @@ const ModalHeader = styled.div`
 
 const ModalTitle = styled.h3`
   font-size: 18px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #FFD700;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 `;
 
 const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #6b7280;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  border: 1px solid #FFD700;
+  border-radius: 50%;
+  color: #FFD700;
   cursor: pointer;
-  padding: 4px;
+  padding: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
   
   &:hover {
-    color: #4b5563;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000000;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
   }
 `;
 
@@ -147,43 +179,85 @@ const FormGroup = styled.div`
 const Label = styled.label`
   display: block;
   font-size: 14px;
-  font-weight: 500;
-  color: #374151;
+  font-weight: 600;
+  color: #FFD700;
   margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 2px solid #666666;
   border-radius: 8px;
   font-size: 14px;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #ffffff;
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #FFD700;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+  }
+  
+  &::placeholder {
+    color: #888888;
   }
 `;
 
 const EmojiPicker = styled.div`
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+    
+    &:hover {
+      background: #9ca3af;
+    }
+  }
 `;
 
 const EmojiButton = styled.button<{ $selected: boolean }>`
-  padding: 8px;
-  border: 1px solid ${props => props.$selected ? '#3b82f6' : '#e5e7eb'};
-  background: ${props => props.$selected ? '#eff6ff' : 'white'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border: 2px solid ${props => props.$selected ? '#FFD700' : '#666666'};
+  background: ${props => props.$selected ? 
+    'linear-gradient(135deg, #FFD700, #FFA500)' : 
+    'linear-gradient(135deg, #2a2a2a, #1f1f1f)'};
   border-radius: 8px;
   font-size: 20px;
   cursor: pointer;
   transition: all 0.2s;
   
   &:hover {
-    border-color: #3b82f6;
-    background: #eff6ff;
+    border-color: #FFD700;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
   }
 `;
 
@@ -196,43 +270,83 @@ const ColorPicker = styled.div`
 const ColorButton = styled.button<{ $color: string; $selected: boolean }>`
   width: 100%;
   height: 32px;
-  background: ${props => props.$color};
-  border: 2px solid ${props => props.$selected ? '#1f2937' : props.$color};
+  background: linear-gradient(135deg, ${props => props.$color}, ${props => props.$color}CC);
+  border: 2px solid ${props => props.$selected ? '#FFD700' : props.$color};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   
   &:hover {
     transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   }
 `;
 
 const SubmitButton = styled.button`
   width: 100%;
   padding: 10px;
-  background: #3b82f6;
-  color: white;
-  border: none;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #000000;
+  border: 2px solid #FFD700;
   border-radius: 8px;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
   
   &:hover {
-    background: #2563eb;
+    background: linear-gradient(135deg, #FFA500, #FF8C00);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+    transform: translateY(-1px);
   }
   
   &:disabled {
-    background: #d1d5db;
+    background: linear-gradient(135deg, #666666, #555555);
+    border-color: #666666;
+    color: #999999;
     cursor: not-allowed;
   }
 `;
 
-const EMOJI_OPTIONS = [
+const TypeSelector = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+`;
+
+const TypeButton = styled.button<{ $selected: boolean }>`
+  flex: 1;
+  padding: 8px;
+  border: 2px solid ${props => props.$selected ? '#FFD700' : '#666666'};
+  background: ${props => props.$selected ? 
+    'linear-gradient(135deg, #FFD700, #FFA500)' : 
+    'linear-gradient(135deg, #2a2a2a, #1f1f1f)'};
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${props => props.$selected ? '#000000' : '#cccccc'};
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    border-color: #FFD700;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000000;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  }
+`;
+
+const EXPENSE_EMOJI_OPTIONS = [
   '🍕', '🍱', '☕', '🛒', '🚗', '🚇', '✈️', '🏠',
   '💊', '🏥', '👕', '👟', '📚', '🎬', '🎪', '🏋️',
   '💡', '📱', '💻', '🎁', '💐', '🐕', '✂️', '🔧'
+];
+
+const INCOME_EMOJI_OPTIONS = [
+  '💰', '💵', '💴', '💶', '💷', '💸', '🏦', '💳',
+  '💎', '🎁', '🏆', '🎯', '📈', '💼', '🏢', '🏭',
+  '🌟', '⭐', '✨', '🎉', '🎊', '🎈', '🏅', '🥇'
 ];
 
 const COLOR_OPTIONS = [
@@ -252,7 +366,8 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onCategoryChan
   const [newCategory, setNewCategory] = useState({
     name: '',
     icon: '📦',
-    color: '#3B82F6'
+    color: '#3B82F6',
+    type: 'expense' as TransactionType
   });
 
   useEffect(() => {
@@ -274,7 +389,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onCategoryChan
     if (created) {
       await loadCategories();
       setIsModalOpen(false);
-      setNewCategory({ name: '', icon: '📦', color: '#3B82F6' });
+      setNewCategory({ name: '', icon: '📦', color: '#3B82F6', type: 'expense' });
       onCategoryChange?.();
     }
   };
@@ -292,8 +407,12 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onCategoryChan
   return (
     <Container>
       <Title>カテゴリー管理</Title>
-      <CategoryList>
-        {categories.map(category => (
+      <div style={{ marginBottom: '16px' }}>
+        <div style={{ marginBottom: '12px' }}>
+          <strong style={{ fontSize: '14px', color: '#666' }}>支出カテゴリー</strong>
+        </div>
+        <CategoryList>
+        {categories.filter(c => c.type === 'expense').map(category => (
           <CategoryItem 
             key={category.id} 
             $color={category.color}
@@ -313,6 +432,34 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onCategoryChan
           <span>新規追加</span>
         </AddButton>
       </CategoryList>
+      </div>
+      
+      <div>
+        <div style={{ marginBottom: '12px' }}>
+          <strong style={{ fontSize: '14px', color: '#666' }}>収入カテゴリー</strong>
+        </div>
+        <CategoryList>
+          {categories.filter(c => c.type === 'income').map(category => (
+            <CategoryItem 
+              key={category.id} 
+              $color={category.color}
+              $isDefault={category.isDefault}
+            >
+              <CategoryIcon>{category.icon}</CategoryIcon>
+              <CategoryName>{category.name}</CategoryName>
+              {!category.isDefault && (
+                <DeleteButton onClick={() => handleDeleteCategory(category.id)}>
+                  <FaTrash size={12} />
+                </DeleteButton>
+              )}
+            </CategoryItem>
+          ))}
+          <AddButton onClick={() => setIsModalOpen(true)}>
+            <FaPlus size={12} />
+            <span>新規追加</span>
+          </AddButton>
+        </CategoryList>
+      </div>
 
       {isModalOpen && (
         <Modal onClick={() => setIsModalOpen(false)}>
@@ -323,6 +470,24 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onCategoryChan
                 <FaTimes size={18} />
               </CloseButton>
             </ModalHeader>
+            
+            <FormGroup>
+              <Label>カテゴリータイプ</Label>
+              <TypeSelector>
+                <TypeButton
+                  $selected={newCategory.type === 'expense'}
+                  onClick={() => setNewCategory({ ...newCategory, type: 'expense' })}
+                >
+                  支出
+                </TypeButton>
+                <TypeButton
+                  $selected={newCategory.type === 'income'}
+                  onClick={() => setNewCategory({ ...newCategory, type: 'income' })}
+                >
+                  収入
+                </TypeButton>
+              </TypeSelector>
+            </FormGroup>
             
             <FormGroup>
               <Label>カテゴリー名</Label>
@@ -338,7 +503,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onCategoryChan
             <FormGroup>
               <Label>アイコン</Label>
               <EmojiPicker>
-                {EMOJI_OPTIONS.map(emoji => (
+                {(newCategory.type === 'expense' ? EXPENSE_EMOJI_OPTIONS : INCOME_EMOJI_OPTIONS).map(emoji => (
                   <EmojiButton
                     key={emoji}
                     $selected={newCategory.icon === emoji}

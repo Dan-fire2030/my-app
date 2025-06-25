@@ -12,20 +12,21 @@ const RemainingAmountMeter = ({ currentBalance, monthlyBudget, onAddExpense, sho
 
   const Container = styled.div`
     position: relative;
-    background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
     border-radius: 16px;
     padding: 32px 24px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    border: 2px solid #FFD700;
     margin-bottom: 24px;
   `;
 
   const Title = styled.h2`
     font-size: 20px;
-    font-weight: 600;
-    color: #1f2937;
+    font-weight: 700;
+    color: #FFD700;
     text-align: center;
     margin-bottom: 24px;
+    text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
   `;
 
   const MeterWrapper = styled.div`
@@ -52,7 +53,7 @@ const RemainingAmountMeter = ({ currentBalance, monthlyBudget, onAddExpense, sho
 
   const CircleBackground = styled.circle`
     fill: none;
-    stroke: #e5e7eb;
+    stroke: #333333;
     stroke-width: 20;
   `;
 
@@ -83,15 +84,17 @@ const RemainingAmountMeter = ({ currentBalance, monthlyBudget, onAddExpense, sho
 
   const LabelText = styled.div`
     font-size: 14px;
-    color: #6b7280;
+    color: #cccccc;
     margin-bottom: 8px;
+    font-weight: 500;
   `;
 
   const AmountText = styled.div`
     font-size: 18px;
-    font-weight: 600;
-    color: #1f2937;
+    font-weight: 700;
+    color: #ffffff;
     margin-bottom: 8px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   `;
 
   const StatusBadge = styled.div`
@@ -128,7 +131,8 @@ const RemainingAmountMeter = ({ currentBalance, monthlyBudget, onAddExpense, sho
 
   const LegendLabel = styled.span`
     font-size: 14px;
-    color: #6b7280;
+    color: #cccccc;
+    font-weight: 500;
   `;
 
   // オシャレなトグルボタン（プラス/マイナス）
@@ -238,7 +242,7 @@ const RemainingAmountMeter = ({ currentBalance, monthlyBudget, onAddExpense, sho
           <LegendLabel>使用済み</LegendLabel>
         </LegendItem>
         <LegendItem>
-          <LegendDot color="#e5e7eb" />
+          <LegendDot color="#333333" />
           <LegendLabel>残り</LegendLabel>
         </LegendItem>
       </Legend>

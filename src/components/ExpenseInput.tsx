@@ -2,29 +2,30 @@ import { useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 2px solid #FFD700;
 `;
 
 const ToggleButton = styled.button`
   width: 100%;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  font-weight: 600;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #000000;
+  font-weight: 700;
   padding: 18px 24px;
   border-radius: 12px;
-  border: none;
+  border: 2px solid #FFD700;
   cursor: pointer;
   font-size: 16px;
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
   transition: all 0.3s ease;
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(59, 130, 246, 0.35);
+    box-shadow: 0 6px 24px rgba(255, 215, 0, 0.6);
+    background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
   }
   
   &:active {
@@ -52,9 +53,11 @@ const FormContainer = styled.div`
 
 const SectionTitle = styled.h3`
   font-size: 14px;
-  font-weight: 500;
-  color: #6b7280;
+  font-weight: 600;
+  color: #FFD700;
   margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 `;
 
 const GenreGrid = styled.div`
@@ -70,16 +73,22 @@ const GenreLabel = styled.label`
   align-items: center;
   justify-content: center;
   padding: 20px;
-  border: 2px solid ${props => props.selected ? props.borderColor : '#e5e7eb'};
+  border: 2px solid ${props => props.selected ? props.borderColor : '#333333'};
   border-radius: 12px;
-  background-color: ${props => props.selected ? props.bgColor : 'white'};
+  background: ${props => props.selected ? 
+    `linear-gradient(135deg, ${props.borderColor}30, ${props.borderColor}10)` : 
+    'linear-gradient(135deg, #2a2a2a, #1f1f1f)'};
   cursor: pointer;
   transition: all 0.2s ease;
   transform: ${props => props.selected ? 'scale(1.02)' : 'scale(1)'};
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   
   &:hover {
-    border-color: ${props => props.selected ? props.borderColor : '#d1d5db'};
-    background-color: ${props => props.selected ? props.bgColor : '#f9fafb'};
+    border-color: ${props => props.selected ? props.borderColor : '#FFD700'};
+    background: ${props => props.selected ? 
+      `linear-gradient(135deg, ${props.borderColor}40, ${props.borderColor}20)` : 
+      'linear-gradient(135deg, #333333, #2a2a2a)'};
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
   }
 `;
 
@@ -95,8 +104,9 @@ const GenreIcon = styled.span`
 
 const GenreName = styled.span`
   font-size: 14px;
-  font-weight: 500;
-  color: ${props => props.selected ? props.color : '#374151'};
+  font-weight: 600;
+  color: ${props => props.selected ? props.color : '#cccccc'};
+  text-shadow: ${props => props.selected ? '1px 1px 2px rgba(0, 0, 0, 0.5)' : 'none'};
 `;
 
 const CheckIcon = styled.div`
@@ -145,35 +155,39 @@ const CurrencySymbol = styled.span`
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #6b7280;
+  color: #FFD700;
   font-size: 16px;
+  font-weight: 600;
 `;
 
 const AmountInput = styled.input`
   width: 100%;
   padding: 12px 12px 12px 32px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #666666;
   border-radius: 8px;
   font-size: 16px;
-  transition: border-color 0.2s ease;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #ffffff;
+  transition: all 0.2s ease;
   box-sizing: border-box;
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: #FFD700;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
   }
   
   &::placeholder {
-    color: #9ca3af;
+    color: #888888;
   }
 `;
 
 const SubmitButton = styled.button`
   padding: 12px 32px;
-  background-color: #10b981;
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
-  font-weight: 600;
-  border: none;
+  font-weight: 700;
+  border: 2px solid #10b981;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -187,12 +201,15 @@ const SubmitButton = styled.button`
   }
   
   &:hover:not(:disabled) {
-    background-color: #059669;
+    background: linear-gradient(135deg, #059669, #047857);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
   }
   
   &:disabled {
-    background-color: #d1d5db;
+    background: linear-gradient(135deg, #666666, #555555);
+    border-color: #666666;
+    color: #999999;
     cursor: not-allowed;
   }
 `;
@@ -205,18 +222,21 @@ const QuickAmountGrid = styled.div`
 
 const QuickAmountButton = styled.button`
   padding: 10px;
-  background-color: #f3f4f6;
-  color: #374151;
-  font-weight: 500;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #cccccc;
+  font-weight: 600;
   font-size: 14px;
-  border: none;
+  border: 1px solid #666666;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: #e5e7eb;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000000;
+    border-color: #FFD700;
     transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
   }
 `;
 

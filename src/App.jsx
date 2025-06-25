@@ -40,8 +40,9 @@ const fadeIn = keyframes`
 
 const AppContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #fef7ff 0%, #f0f9ff 50%, #f0fff4 100%);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #000000 100%);
   padding: 16px;
+  color: #ffffff;
   
   @media (min-width: 768px) {
     padding: 24px;
@@ -59,6 +60,11 @@ const Header = styled.div`
   text-align: center;
   margin-bottom: 32px;
   animation: ${fadeIn} 0.6s ease-out;
+  padding-top: 60px;
+  
+  @media (max-width: 768px) {
+    padding-top: 0;
+  }
 `;
 
 const UserInfo = styled.div`
@@ -68,11 +74,12 @@ const UserInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  border: 1px solid #FFD700;
   border-radius: 12px;
   padding: 8px 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
+  z-index: 10;
   
   @media (max-width: 768px) {
     position: static;
@@ -83,7 +90,7 @@ const UserInfo = styled.div`
 
 const UserEmail = styled.span`
   font-size: 14px;
-  color: #64748b;
+  color: #e5e5e5;
   font-weight: 500;
   
   @media (max-width: 640px) {
@@ -92,19 +99,20 @@ const UserEmail = styled.span`
 `;
 
 const LogoutButton = styled.button`
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  border: 1px solid #cbd5e1;
-  color: #475569;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  border: 1px solid #FFD700;
+  color: #000000;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   padding: 6px 12px;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
   }
   
   &:active {
@@ -119,8 +127,8 @@ const HamburgerButton = styled.button`
   right: 0;
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, #FFE4E6, #F3E8FF);
-  border: none;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  border: 2px solid #FFD700;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -128,11 +136,12 @@ const HamburgerButton = styled.button`
   justify-content: center;
   transition: all 0.3s ease;
   z-index: 30;
-  box-shadow: 0 4px 20px rgba(251, 207, 232, 0.3);
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(251, 207, 232, 0.4);
+    box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
+    border-color: #FFA500;
   }
   
   @media (max-width: 640px) {
@@ -151,7 +160,7 @@ const HamburgerIcon = styled.div`
     position: absolute;
     width: 100%;
     height: 2px;
-    background: linear-gradient(45deg, #9333EA, #EC4899);
+    background: linear-gradient(45deg, #FFD700, #FFA500);
     border-radius: 2px;
     transition: all 0.3s ease;
     
@@ -200,20 +209,46 @@ const MenuModal = styled.div`
   width: 90vw;
   max-width: 600px;
   max-height: 80vh;
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
   z-index: 1001;
   padding: 32px;
+  padding-right: 20px;
   overflow-y: auto;
   opacity: ${props => props.isOpen ? '1' : '0'};
   visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 2px solid #FFD700;
+  
+  /* カスタムスクロールバー */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 4px;
+    margin: 8px 0;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #FFD700;
+    border-radius: 4px;
+    
+    &:hover {
+      background: #FFA500;
+    }
+  }
+  
+  /* Firefox用 */
+  scrollbar-width: thin;
+  scrollbar-color: #FFD700 #1a1a1a;
   
   @media (max-width: 640px) {
     width: 95vw;
     padding: 24px;
+    padding-right: 16px;
     max-height: 85vh;
   }
 `;
@@ -225,7 +260,7 @@ const MenuOverlay = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8);
   z-index: 1000;
   opacity: ${props => props.isOpen ? '1' : '0'};
   visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
@@ -240,13 +275,13 @@ const ModalHeader = styled.div`
   align-items: center;
   margin-bottom: 32px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #FFD700;
 `;
 
 const ModalTitle = styled.h2`
   font-size: 24px;
   font-weight: 700;
-  background: linear-gradient(135deg, #9333EA 0%, #EC4899 50%, #F59E0B 100%);
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -257,8 +292,8 @@ const CloseButton = styled.button`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  border: none;
+  background: linear-gradient(135deg, #333333 0%, #1a1a1a 100%);
+  border: 1px solid #FFD700;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -266,14 +301,18 @@ const CloseButton = styled.button`
   transition: all 0.2s ease;
   
   &:hover {
-    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
     transform: scale(1.05);
   }
   
   svg {
     width: 20px;
     height: 20px;
-    color: #6b7280;
+    color: #FFD700;
+  }
+  
+  &:hover svg {
+    color: #000000;
   }
 `;
 
@@ -285,29 +324,65 @@ const MenuContent = styled.div`
 // バーガーメニュー用の月次設定ボタン
 const BudgetSettingButton = styled.button`
   width: 100%;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  font-weight: 600;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1f1f1f 100%);
+  color: #FFD700;
+  font-weight: 700;
   font-size: 16px;
-  border: none;
-  border-radius: 12px;
+  border: 2px solid #FFD700;
+  border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+  box-shadow: 
+    0 4px 16px rgba(255, 215, 0, 0.2),
+    inset 0 1px 0 rgba(255, 215, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  /* グロー効果 */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
   
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2f2f2f 100%);
+    border-color: #FFA500;
+    color: #FFA500;
+    box-shadow: 
+      0 8px 24px rgba(255, 215, 0, 0.4),
+      0 0 20px rgba(255, 215, 0, 0.2),
+      inset 0 1px 0 rgba(255, 165, 0, 0.2);
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  &:active {
+    transform: translateY(-1px);
+    box-shadow: 
+      0 4px 12px rgba(255, 215, 0, 0.3),
+      inset 0 2px 4px rgba(0, 0, 0, 0.2);
   }
   
   svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
+    filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
   }
 `;
 
@@ -323,26 +398,72 @@ const AnimatedSection = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: 36px;
-  font-weight: bold;
-  background: linear-gradient(135deg, #9333EA 0%, #EC4899 50%, #F59E0B 100%);
+  font-size: 48px;
+  font-weight: 900;
+  font-family: 'Orbitron', 'Montserrat', -apple-system, sans-serif;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 12px;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  position: relative;
+  display: inline-block;
+  
+  /* 浮かび上がる効果 */
+  text-shadow: 
+    0 1px 0 rgba(255, 215, 0, 0.3),
+    0 2px 4px rgba(255, 215, 0, 0.2),
+    0 4px 8px rgba(255, 215, 0, 0.15),
+    0 8px 16px rgba(255, 215, 0, 0.1),
+    0 16px 32px rgba(255, 215, 0, 0.05);
+  
+  /* アニメーション */
+  animation: float 3s ease-in-out infinite;
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+  
+  /* グロー効果 */
+  &::before {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: blur(10px);
+    opacity: 0.5;
+  }
   
   @media (max-width: 640px) {
-    font-size: 28px;
+    font-size: 32px;
   }
 `;
 
 const Subtitle = styled.p`
-  color: #7C3AED;
-  font-size: 16px;
-  font-weight: 500;
-  opacity: 0.8;
+  font-size: 14px;
+  color: #cccccc;
   margin-top: 4px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  
+  @media (max-width: 640px) {
+    font-size: 12px;
+  }
 `;
 
 
@@ -357,16 +478,16 @@ const ExpenseModal = styled.div`
   width: 90vw;
   max-width: 500px;
   max-height: 80vh;
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
   z-index: 1001;
   padding: 32px;
   overflow-y: auto;
   opacity: ${props => props.isOpen ? '1' : '0'};
   visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 2px solid #FFD700;
   
   @media (max-width: 640px) {
     width: 95vw;
@@ -382,7 +503,7 @@ const ExpenseOverlay = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8);
   z-index: 1000;
   opacity: ${props => props.isOpen ? '1' : '0'};
   visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
@@ -397,13 +518,13 @@ const ExpenseModalHeader = styled.div`
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #FFD700;
 `;
 
 const ExpenseModalTitle = styled.h2`
   font-size: 20px;
   font-weight: 700;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -420,15 +541,15 @@ const BudgetSetupModal = styled.div`
     'translate(-50%, -50%) scale(0.95)'};
   width: 90vw;
   max-width: 480px;
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
   z-index: 1002;
   padding: 40px;
   opacity: ${props => props.isOpen ? '1' : '0'};
   visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 2px solid #FFD700;
   
   @media (max-width: 640px) {
     width: 95vw;
@@ -857,7 +978,7 @@ const BudgetApp = () => {
 
       const newTransaction = {
         amount: amount,
-        date: new Date().toLocaleDateString(),
+        date: new Date().toISOString(),
         remainingBalance: newBalance,
         jenre: selectedRadioButton,
         type: transactionType,
@@ -941,8 +1062,8 @@ const BudgetApp = () => {
               <div className="line"></div>
             </HamburgerIcon>
           </HamburgerButton>
-          <Title>家計簿アプリ</Title>
-          <Subtitle>毎月の収支を賢く管理しよう</Subtitle>
+          <Title data-text="WEALTH TRACKER">WEALTH TRACKER</Title>
+          <Subtitle>Master Your Monthly Budget</Subtitle>
         </Header>
 
         <ContentGrid>

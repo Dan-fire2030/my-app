@@ -5,23 +5,24 @@ import { Category, TransactionType } from '../utils/types';
 import { useAuth } from '../contexts/FirebaseAuthContext';
 
 const Container = styled.div`
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 2px solid #FFD700;
 `;
 
 const Title = styled.h2`
   font-size: 20px;
   font-weight: 600;
-  color: #1f2937;
+  color: #FFD700;
   margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 `;
 
 const EmptyMessage = styled.p`
   text-align: center;
-  color: #6b7280;
+  color: #cccccc;
   padding: 40px 0;
 `;
 
@@ -35,15 +36,22 @@ const TransactionItem = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background-color: #f9fafb;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
   border-radius: 12px;
   transition: all 0.2s ease;
   min-height: 72px;
+  border: 1px solid #333333;
   
   &:hover {
-    background-color: #f3f4f6;
+    background: linear-gradient(135deg, #333333 0%, #2a2a2a 100%);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+    border-color: #FFD700;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 12px;
+    min-height: 64px;
   }
 `;
 
@@ -58,13 +66,21 @@ const GenreIcon = styled.div<{ $bgColor: string; $color: string }>`
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background-color: ${props => props.$bgColor};
+  background: linear-gradient(135deg, ${props => props.$color}40, ${props => props.$color}20);
   color: ${props => props.$color};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
   font-weight: 600;
+  flex-shrink: 0;
+  border: 1px solid ${props => props.$color};
+  
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
 `;
 
 const TransactionInfo = styled.div`
@@ -77,6 +93,10 @@ const TransactionAmount = styled.div<{ $isIncome: boolean }>`
   font-weight: 600;
   font-size: 16px;
   color: ${props => props.$isIncome ? '#10b981' : '#ef4444'};
+  
+  @media (max-width: 768px) {
+    font-size: 15px;
+  }
 `;
 
 const TransactionDetails = styled.div`
@@ -84,22 +104,40 @@ const TransactionDetails = styled.div`
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #6b7280;
+  color: #cccccc;
+  flex-wrap: wrap;
+  
+  @media (max-width: 768px) {
+    font-size: 12px;
+    gap: 6px;
+  }
 `;
 
 const TransactionGenre = styled.span`
   font-weight: 500;
+  color: #ffffff;
 `;
 
-const TransactionNote = styled.span`
+const TransactionNote = styled.div`
   font-style: italic;
-  opacity: 0.8;
+  opacity: 0.9;
+  color: #cccccc;
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  max-width: 100%;
 `;
 
 const TransactionDate = styled.div`
   font-size: 14px;
-  color: #6b7280;
+  color: #cccccc;
   text-align: right;
+  
+  @media (max-width: 768px) {
+    font-size: 12px;
+    min-width: 60px;
+  }
 `;
 
 const ActionButtons = styled.div`
@@ -107,24 +145,30 @@ const ActionButtons = styled.div`
   align-items: center;
   gap: 8px;
   margin-left: 12px;
+  
+  @media (max-width: 768px) {
+    margin-left: 8px;
+  }
 `;
 
 const DeleteButton = styled.button`
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+  border: 1px solid #666666;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  color: #cccccc;
   
   &:hover {
-    background-color: #fee2e2;
-    border-color: #fecaca;
-    color: #ef4444;
+    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+    border-color: #ff4444;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.3);
   }
   
   svg {
@@ -141,33 +185,36 @@ const ConfirmButtons = styled.div`
 
 const ConfirmButton = styled.button`
   padding: 6px 12px;
-  background-color: #ef4444;
+  background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
   color: white;
   font-size: 12px;
-  font-weight: 500;
-  border: none;
+  font-weight: 600;
+  border: 1px solid #ff4444;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: #dc2626;
+    background: linear-gradient(135deg, #cc0000 0%, #aa0000 100%);
+    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.3);
   }
 `;
 
 const CancelButton = styled.button`
   padding: 6px 12px;
-  background-color: #f3f4f6;
-  color: #374151;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+  color: #cccccc;
   font-size: 12px;
   font-weight: 500;
-  border: none;
+  border: 1px solid #666666;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: #e5e7eb;
+    background: linear-gradient(135deg, #333333 0%, #2a2a2a 100%);
+    border-color: #FFD700;
+    color: #FFD700;
   }
 `;
 
@@ -175,9 +222,11 @@ const TypeBadge = styled.div<{ $type: TransactionType }>`
   padding: 2px 8px;
   border-radius: 12px;
   font-size: 12px;
-  font-weight: 500;
-  background: ${props => props.$type === 'income' ? '#d1fae5' : '#fee2e2'};
-  color: ${props => props.$type === 'income' ? '#059669' : '#dc2626'};
+  font-weight: 600;
+  background: ${props => props.$type === 'income' ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #ef4444, #dc2626)'};
+  color: #ffffff;
+  border: 1px solid ${props => props.$type === 'income' ? '#10b981' : '#ef4444'};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
 interface Transaction {
@@ -263,19 +312,21 @@ const TransactionHistoryUpdated: React.FC<TransactionHistoryProps> = ({
                     <TransactionAmount $isIncome={isIncome}>
                       {isIncome ? '+' : '-'}¥{transaction.amount.toLocaleString()}
                     </TransactionAmount>
-                    <TransactionDetails>
-                      <TransactionGenre>{transaction.jenre}</TransactionGenre>
-                      <TypeBadge $type={transaction.type || 'expense'}>
-                        {isIncome ? '収入' : '支出'}
-                      </TypeBadge>
+                    <div>
+                      <TransactionDetails>
+                        <TransactionGenre>{transaction.jenre}</TransactionGenre>
+                        <TypeBadge $type={transaction.type || 'expense'}>
+                          {isIncome ? '収入' : '支出'}
+                        </TypeBadge>
+                      </TransactionDetails>
                       {transaction.note && (
-                        <TransactionNote>• {transaction.note}</TransactionNote>
+                        <TransactionNote>{transaction.note}</TransactionNote>
                       )}
-                    </TransactionDetails>
+                    </div>
                   </TransactionInfo>
                 </TransactionLeft>
                 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
                   <TransactionDate>
                     {formatDate(transaction.date)}
                   </TransactionDate>

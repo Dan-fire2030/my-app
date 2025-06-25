@@ -2,24 +2,26 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 2px solid #FFD700;
 `;
 
 const Title = styled.h2`
   font-size: 20px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #FFD700;
   margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 `;
 
 const EmptyMessage = styled.p`
   text-align: center;
-  color: #6b7280;
+  color: #cccccc;
   padding: 40px 0;
+  font-weight: 500;
 `;
 
 const HistoryList = styled.div`
@@ -28,15 +30,16 @@ const HistoryList = styled.div`
 `;
 
 const HistoryItem = styled.div`
-  border: 1px solid rgba(229, 231, 235, 0.6);
+  border: 1px solid #333333;
   border-radius: 12px;
   padding: 20px;
-  background: linear-gradient(135deg, #fafafa 0%, #f3f4f6 100%);
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
   transition: all 0.2s ease;
   
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+    border-color: #FFD700;
   }
 `;
 
@@ -51,27 +54,32 @@ const BudgetInfo = styled.div``;
 
 const MonthLabel = styled.div`
   font-size: 14px;
-  font-weight: 500;
-  color: #6b7280;
+  font-weight: 600;
+  color: #FFD700;
   margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 `;
 
 const BudgetAmount = styled.h3`
   font-size: 16px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #ffffff;
   margin-bottom: 4px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 `;
 
 const BudgetStats = styled.div`
   font-size: 14px;
-  color: #6b7280;
+  color: #cccccc;
   line-height: 1.5;
+  font-weight: 500;
 `;
 
 const TransactionCount = styled.span`
   font-size: 14px;
-  color: #6b7280;
+  color: #cccccc;
+  font-weight: 500;
 `;
 
 const SpentAmount = styled.span`
@@ -86,14 +94,16 @@ const RemainingAmount = styled.span`
 const TransactionSection = styled.div`
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #FFD700;
 `;
 
 const TransactionLabel = styled.div`
   font-size: 14px;
-  font-weight: 500;
-  color: #6b7280;
+  font-weight: 600;
+  color: #FFD700;
   margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 `;
 
 const TransactionGrid = styled.div`
@@ -113,7 +123,7 @@ const TransactionMiniLeft = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #6b7280;
+  color: #cccccc;
 `;
 
 const TransactionMiniRight = styled.div`
@@ -123,20 +133,31 @@ const TransactionMiniRight = styled.div`
 `;
 
 const TransactionMiniAmount = styled.span`
-  font-weight: 500;
-  color: #1f2937;
+  font-weight: 600;
+  color: #ffffff;
 `;
 
 const TransactionMiniDate = styled.span`
-  color: #9ca3af;
+  color: #888888;
   font-size: 13px;
 `;
 
 const MoreTransactions = styled.button`
   width: 100%;
   text-align: center;
-  color: #3b82f6;
-  background: none;
+  color: #FFD700;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  border: 1px solid #FFD700;
+  border-radius: 6px;
+  padding: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000000;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  }
   border: none;
   font-size: 14px;
   margin-top: 8px;

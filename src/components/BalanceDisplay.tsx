@@ -1,18 +1,19 @@
 import styled from 'styled-components';
 
 const Container = styled.div`
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 2px solid #FFD700;
 `;
 
 const Title = styled.h2`
   font-size: 20px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #FFD700;
   margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 `;
 
 const InfoGrid = styled.div`
@@ -25,20 +26,30 @@ const InfoRow = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background-color: ${props => props.highlight ? (props.negative ? '#fef2f2' : '#f0fdf4') : '#f9fafb'};
+  background: ${props => props.highlight ? 
+    (props.negative ? 'linear-gradient(135deg, #2a1a1a, #3a1a1a)' : 'linear-gradient(135deg, #1a2a1a, #1a3a1a)') : 
+    'linear-gradient(135deg, #2a2a2a, #1f1f1f)'};
   border-radius: 8px;
-  transition: background-color 0.3s ease;
+  border: 1px solid ${props => props.highlight ? 
+    (props.negative ? '#ef4444' : '#10b981') : '#333333'};
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
+  }
 `;
 
 const Label = styled.span`
-  color: #6b7280;
+  color: #cccccc;
   font-size: 16px;
+  font-weight: 500;
 `;
 
 const Value = styled.span`
   font-size: 18px;
-  font-weight: 600;
-  color: ${props => props.negative ? '#ef4444' : props.positive ? '#10b981' : '#1f2937'};
+  font-weight: 700;
+  color: ${props => props.negative ? '#ef4444' : props.positive ? '#10b981' : '#ffffff'};
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 `;
 
 const ProgressSection = styled.div`
@@ -53,25 +64,29 @@ const ProgressHeader = styled.div`
 
 const ProgressLabel = styled.span`
   font-size: 14px;
-  color: #6b7280;
+  color: #cccccc;
+  font-weight: 500;
 `;
 
 const ProgressBar = styled.div`
   width: 100%;
   height: 8px;
-  background-color: #e5e7eb;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  border: 1px solid #333333;
   border-radius: 4px;
   overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 `;
 
 const ProgressFill = styled.div`
   height: 100%;
-  background-color: ${props => 
-    props.percentage > 90 ? '#ef4444' : 
-    props.percentage > 70 ? '#f59e0b' : '#10b981'
+  background: ${props => 
+    props.percentage > 90 ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 
+    props.percentage > 70 ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #10b981, #059669)'
   };
   width: ${props => Math.min(props.percentage, 100)}%;
-  transition: width 0.5s ease-out, background-color 0.3s ease;
+  transition: width 0.5s ease-out, background 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 `;
 
 const BalanceDisplay = ({ monthlyBudget, currentBalance }) => {

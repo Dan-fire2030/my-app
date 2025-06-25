@@ -1,18 +1,19 @@
 import styled from 'styled-components';
 
 const Container = styled.div`
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 2px solid #FFD700;
 `;
 
 const Title = styled.h2`
   font-size: 20px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #FFD700;
   margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 `;
 
 const PresetSection = styled.div`
@@ -21,8 +22,9 @@ const PresetSection = styled.div`
 
 const SectionLabel = styled.p`
   font-size: 14px;
-  color: #6b7280;
+  color: #cccccc;
   margin-bottom: 12px;
+  font-weight: 500;
 `;
 
 const PresetGrid = styled.div`
@@ -37,17 +39,20 @@ const PresetGrid = styled.div`
 
 const PresetButton = styled.button`
   padding: 10px;
-  background-color: #f3f4f6;
-  color: #374151;
-  font-weight: 500;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #cccccc;
+  font-weight: 600;
   font-size: 14px;
-  border: none;
+  border: 1px solid #666666;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: #e5e7eb;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000000;
+    border-color: #FFD700;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
     transform: translateY(-1px);
   }
 `;
@@ -78,20 +83,33 @@ const CurrencySymbol = styled.span`
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #6b7280;
+  color: #FFD700;
   font-size: 16px;
+  font-weight: 600;
 `;
 
 const BudgetInput = styled.input`
   width: 100%;
   padding: 12px 12px 12px 32px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #666666;
   border-radius: 8px;
   font-size: 16px;
-  transition: border-color 0.2s ease;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #ffffff;
+  transition: all 0.2s ease;
   box-sizing: border-box;
   
   &:focus {
+    outline: none;
+    border-color: #FFD700;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+  }
+  
+  &::placeholder {
+    color: #888888;
+  }
+  
+  &:disabled {
     outline: none;
     border-color: #3b82f6;
   }
@@ -103,17 +121,17 @@ const BudgetInput = styled.input`
 
 const SetButton = styled.button`
   padding: 14px 32px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  font-weight: 600;
-  border: none;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #000000;
+  font-weight: 700;
+  border: 2px solid #FFD700;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
   flex-shrink: 0;
   box-sizing: border-box;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 16px rgba(255, 215, 0, 0.4);
   
   @media (min-width: 768px) {
     width: auto;
@@ -121,24 +139,28 @@ const SetButton = styled.button`
   }
   
   &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
   }
   
   &:disabled {
-    background: #d1d5db;
+    background: linear-gradient(135deg, #666666, #555555);
+    border-color: #666666;
+    color: #999999;
     cursor: not-allowed;
     box-shadow: none;
   }
 `;
 
 const WarningBox = styled.div`
-  background-color: #fffbeb;
-  border: 1px solid #fbbf24;
+  background: linear-gradient(135deg, #2a2a1a, #1f1f0f);
+  border: 1px solid #FFD700;
   border-radius: 8px;
   padding: 12px;
   display: flex;
   align-items: flex-start;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
   gap: 8px;
 `;
 

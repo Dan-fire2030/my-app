@@ -2,24 +2,26 @@ import { useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 2px solid #FFD700;
 `;
 
 const Title = styled.h2`
   font-size: 20px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #FFD700;
   margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 `;
 
 const EmptyMessage = styled.p`
   text-align: center;
-  color: #6b7280;
+  color: #cccccc;
   padding: 40px 0;
+  font-weight: 500;
 `;
 
 const TransactionList = styled.div`
@@ -32,13 +34,16 @@ const TransactionItem = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background-color: #f9fafb;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+  border: 1px solid #333333;
   border-radius: 8px;
   transition: all 0.2s ease;
   min-height: 72px;
   
   &:hover {
-    background-color: #f3f4f6;
+    background: linear-gradient(135deg, #333333 0%, #2a2a2a 100%);
+    border-color: #FFD700;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
   }
 `;
 
@@ -67,19 +72,22 @@ const TransactionInfo = styled.div`
 `;
 
 const TransactionAmount = styled.div`
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #ffffff;
   font-size: 16px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 `;
 
 const TransactionGenre = styled.div`
   font-size: 14px;
-  color: #6b7280;
+  color: #cccccc;
+  font-weight: 500;
 `;
 
 const TransactionDate = styled.div`
   font-size: 14px;
-  color: #6b7280;
+  color: #cccccc;
+  font-weight: 500;
 `;
 
 const ActionButtons = styled.div`
@@ -93,16 +101,18 @@ const DeleteButton = styled.button`
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #e5e7eb;
-  border: none;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  border: 1px solid #666666;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  color: #cccccc;
   
   &:hover {
-    background-color: #fee2e2;
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border-color: #ef4444;
     color: #ef4444;
   }
   
@@ -120,33 +130,36 @@ const ConfirmButtons = styled.div`
 
 const ConfirmDeleteButton = styled.button`
   padding: 6px 12px;
-  background-color: #ef4444;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
   font-size: 12px;
-  font-weight: 500;
-  border: none;
+  font-weight: 600;
+  border: 1px solid #ef4444;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: #dc2626;
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
   }
 `;
 
 const CancelButton = styled.button`
   padding: 6px 12px;
-  background-color: #f3f4f6;
-  color: #374151;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #cccccc;
   font-size: 12px;
-  font-weight: 500;
-  border: none;
+  font-weight: 600;
+  border: 1px solid #666666;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: #e5e7eb;
+    background: linear-gradient(135deg, #333333, #2a2a2a);
+    border-color: #FFD700;
+    color: #FFD700;
   }
 `;
 

@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/FirebaseAuthContext';
 
 const AuthContainer = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #fef7ff 0%, #f0f9ff 50%, #f0fff4 100%);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #000000 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,13 +12,13 @@ const AuthContainer = styled.div`
 `;
 
 const AuthCard = styled.div`
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
   padding: 48px;
   width: 100%;
   max-width: 400px;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 2px solid #FFD700;
   
   @media (max-width: 640px) {
     padding: 32px 24px;
@@ -33,19 +33,20 @@ const AuthHeader = styled.div`
 const AuthTitle = styled.h1`
   font-size: 32px;
   font-weight: bold;
-  background: linear-gradient(135deg, #9333EA 0%, #EC4899 50%, #F59E0B 100%);
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 8px;
   letter-spacing: -0.02em;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 `;
 
 const AuthSubtitle = styled.p`
-  color: #7C3AED;
+  color: #cccccc;
   font-size: 16px;
   font-weight: 500;
-  opacity: 0.8;
+  opacity: 0.9;
 `;
 
 const AuthForm = styled.form`
@@ -61,45 +62,51 @@ const InputGroup = styled.div`
 
 const InputLabel = styled.label`
   font-size: 14px;
-  font-weight: 500;
-  color: #374151;
+  font-weight: 600;
+  color: #FFD700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #666666;
   border-radius: 10px;
   font-size: 16px;
-  transition: border-color 0.2s ease;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #ffffff;
+  transition: all 0.2s ease;
   box-sizing: border-box;
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: #FFD700;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
   }
   
   &::placeholder {
-    color: #9ca3af;
+    color: #888888;
   }
 `;
 
 const SubmitButton = styled.button`
   width: 100%;
   padding: 14px 24px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #000000;
   font-size: 16px;
-  font-weight: 600;
-  border: none;
+  font-weight: 700;
+  border: 2px solid #FFD700;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 16px rgba(255, 215, 0, 0.4);
   
   &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
   }
   
   &:disabled {
@@ -112,11 +119,11 @@ const SubmitButton = styled.button`
 const GoogleButton = styled.button`
   width: 100%;
   padding: 14px 24px;
-  background: white;
-  color: #374151;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #ffffff;
   font-size: 16px;
   font-weight: 600;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #666666;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -127,15 +134,17 @@ const GoogleButton = styled.button`
   margin-bottom: 16px;
   
   &:hover {
-    border-color: #d1d5db;
-    background-color: #f9fafb;
+    border-color: #FFD700;
+    background: linear-gradient(135deg, #333333, #2a2a2a);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
   }
 `;
 
 const ToggleButton = styled.button`
   background: none;
   border: none;
-  color: #3b82f6;
+  color: #FFD700;
+  font-weight: 600;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;

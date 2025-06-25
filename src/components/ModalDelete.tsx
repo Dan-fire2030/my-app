@@ -3,7 +3,7 @@ import styled from "styled-components";
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11,15 +11,15 @@ const Overlay = styled.div`
 `;
 
 const Modal = styled.div`
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
   padding: 32px;
   max-width: 420px;
   width: 90%;
   margin: 0 16px;
   animation: slideUp 0.3s ease-out;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 2px solid #FFD700;
   
   @keyframes slideUp {
     from {
@@ -42,11 +42,13 @@ const IconContainer = styled.div`
 const IconWrapper = styled.div`
   width: 48px;
   height: 48px;
-  background-color: #fee2e2;
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  border: 1px solid #ef4444;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 `;
 
 const Icon = styled.svg`
@@ -57,17 +59,19 @@ const Icon = styled.svg`
 
 const Title = styled.h3`
   font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #ffffff;
   text-align: center;
   margin-bottom: 8px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 `;
 
 const Description = styled.p`
   font-size: 14px;
-  color: #6b7280;
+  color: #cccccc;
   text-align: center;
   margin-bottom: 24px;
+  font-weight: 500;
 `;
 
 const ButtonGroup = styled.div`
@@ -78,32 +82,35 @@ const ButtonGroup = styled.div`
 const CancelButton = styled.button`
   flex: 1;
   padding: 10px 16px;
-  background-color: #f3f4f6;
-  color: #374151;
-  font-weight: 500;
-  border: none;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #cccccc;
+  font-weight: 600;
+  border: 1px solid #666666;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: #e5e7eb;
+    background: linear-gradient(135deg, #333333, #2a2a2a);
+    border-color: #FFD700;
+    color: #FFD700;
   }
 `;
 
 const DeleteButton = styled.button`
   flex: 1;
   padding: 10px 16px;
-  background-color: #ef4444;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
-  font-weight: 500;
-  border: none;
+  font-weight: 700;
+  border: 1px solid #ef4444;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: #dc2626;
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
   }
 `;
 

@@ -1,18 +1,19 @@
 import styled from "styled-components";
 
 const Container = styled.div`
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 2px solid #FFD700;
 `;
 
 const Title = styled.h2`
   font-size: 20px;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #FFD700;
   margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 `;
 
 const GenreList = styled.div`
@@ -42,8 +43,9 @@ const GenreIcon = styled.span`
 `;
 
 const GenreName = styled.span`
-  font-weight: 500;
-  color: #374151;
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 `;
 
 const GenreStats = styled.div`
@@ -51,22 +53,26 @@ const GenreStats = styled.div`
 `;
 
 const GenreAmount = styled.div`
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 `;
 
 const GenrePercentage = styled.div`
   font-size: 14px;
-  color: #6b7280;
+  color: #cccccc;
+  font-weight: 500;
 `;
 
 const ProgressBar = styled.div`
   position: relative;
   width: 100%;
   height: 12px;
-  background-color: #e5e7eb;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  border: 1px solid #333333;
   border-radius: 6px;
   overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 `;
 
 const ProgressFill = styled.div`
@@ -83,21 +89,24 @@ const ProgressFill = styled.div`
 const TotalSection = styled.div`
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #FFD700;
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
 
 const TotalLabel = styled.span`
-  font-weight: 600;
-  color: #374151;
+  font-weight: 700;
+  color: #FFD700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 `;
 
 const TotalAmount = styled.span`
   font-size: 18px;
   font-weight: bold;
-  color: #1f2937;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 `;
 
 const GenreBreakdown = ({ genreData }) => {

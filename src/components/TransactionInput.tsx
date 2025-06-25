@@ -5,29 +5,30 @@ import { Category, TransactionType } from '../utils/types';
 import { useAuth } from '../contexts/FirebaseAuthContext';
 
 const Container = styled.div`
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 2px solid #FFD700;
 `;
 
 const ToggleButton = styled.button`
   width: 100%;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  font-weight: 600;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #000000;
+  font-weight: 700;
   padding: 18px 24px;
   border-radius: 12px;
-  border: none;
+  border: 2px solid #FFD700;
   cursor: pointer;
   font-size: 16px;
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
   transition: all 0.3s ease;
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(59, 130, 246, 0.35);
+    box-shadow: 0 6px 24px rgba(255, 215, 0, 0.6);
+    background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
   }
   
   &:active {
@@ -62,26 +63,33 @@ const TypeSelector = styled.div`
 
 const TypeButton = styled.button<{ $active: boolean; $type: TransactionType }>`
   padding: 12px;
-  border: 2px solid ${props => props.$active ? (props.$type === 'expense' ? '#ef4444' : '#10b981') : '#e5e7eb'};
-  background: ${props => props.$active ? (props.$type === 'expense' ? '#fee2e2' : '#d1fae5') : 'white'};
-  color: ${props => props.$active ? (props.$type === 'expense' ? '#dc2626' : '#059669') : '#6b7280'};
+  border: 2px solid ${props => props.$active ? (props.$type === 'expense' ? '#ef4444' : '#10b981') : '#666666'};
+  background: ${props => props.$active ? 
+    (props.$type === 'expense' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'linear-gradient(135deg, #10b981, #059669)') : 
+    'linear-gradient(135deg, #2a2a2a, #1f1f1f)'};
+  color: ${props => props.$active ? '#ffffff' : '#cccccc'};
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background: ${props => props.$type === 'expense' ? '#fee2e2' : '#d1fae5'};
+    background: ${props => props.$type === 'expense' ? 
+      'linear-gradient(135deg, #ef4444, #dc2626)' : 
+      'linear-gradient(135deg, #10b981, #059669)'};
     border-color: ${props => props.$type === 'expense' ? '#ef4444' : '#10b981'};
-    color: ${props => props.$type === 'expense' ? '#dc2626' : '#059669'};
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 `;
 
 const SectionTitle = styled.h3`
   font-size: 14px;
-  font-weight: 500;
-  color: #6b7280;
+  font-weight: 600;
+  color: #FFD700;
   margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 `;
 
 const GenreGrid = styled.div`
@@ -114,16 +122,21 @@ const GenreLabel = styled.label<{ $selected: boolean; $borderColor: string; $bgC
   align-items: center;
   justify-content: center;
   padding: 20px;
-  border: 2px solid ${props => props.$selected ? props.$borderColor : '#e5e7eb'};
+  border: 2px solid ${props => props.$selected ? props.$borderColor : '#333333'};
   border-radius: 12px;
-  background-color: ${props => props.$selected ? props.$bgColor : 'white'};
+  background: ${props => props.$selected ? 
+    `linear-gradient(135deg, ${props.$borderColor}30, ${props.$borderColor}10)` : 
+    'linear-gradient(135deg, #2a2a2a, #1f1f1f)'};
   cursor: pointer;
   transition: all 0.2s ease;
   transform: ${props => props.$selected ? 'scale(1.02)' : 'scale(1)'};
   
   &:hover {
-    border-color: ${props => props.$selected ? props.$borderColor : '#d1d5db'};
-    background-color: ${props => props.$selected ? props.$bgColor : '#f9fafb'};
+    border-color: ${props => props.$selected ? props.$borderColor : '#FFD700'};
+    background: ${props => props.$selected ? 
+      `linear-gradient(135deg, ${props.$borderColor}40, ${props.$borderColor}20)` : 
+      'linear-gradient(135deg, #333333, #2a2a2a)'};
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
   }
 `;
 
@@ -139,8 +152,8 @@ const GenreIcon = styled.span`
 
 const GenreName = styled.span<{ $selected: boolean; $color: string }>`
   font-size: 14px;
-  font-weight: 500;
-  color: ${props => props.$selected ? props.$color : '#374151'};
+  font-weight: 600;
+  color: ${props => props.$selected ? props.$color : '#cccccc'};
 `;
 
 const CheckIcon = styled.div<{ $color: string }>`
@@ -189,53 +202,62 @@ const CurrencySymbol = styled.span`
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #6b7280;
+  color: #FFD700;
   font-size: 16px;
+  font-weight: 600;
 `;
 
 const AmountInput = styled.input`
   width: 100%;
   padding: 12px 12px 12px 32px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #666666;
   border-radius: 8px;
   font-size: 16px;
-  transition: border-color 0.2s ease;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #ffffff;
+  transition: all 0.2s ease;
   box-sizing: border-box;
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: #FFD700;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
   }
   
   &::placeholder {
-    color: #9ca3af;
+    color: #888888;
   }
 `;
 
 const NoteInput = styled.input`
   width: 100%;
   padding: 12px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #666666;
   border-radius: 8px;
   font-size: 14px;
-  transition: border-color 0.2s ease;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #ffffff;
+  transition: all 0.2s ease;
   
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: #FFD700;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
   }
   
   &::placeholder {
-    color: #9ca3af;
+    color: #888888;
   }
 `;
 
 const SubmitButton = styled.button<{ $type: TransactionType }>`
   padding: 12px 32px;
-  background-color: ${props => props.$type === 'expense' ? '#ef4444' : '#10b981'};
+  background: ${props => props.$type === 'expense' ? 
+    'linear-gradient(135deg, #ef4444, #dc2626)' : 
+    'linear-gradient(135deg, #10b981, #059669)'};
   color: white;
-  font-weight: 600;
-  border: none;
+  font-weight: 700;
+  border: 2px solid ${props => props.$type === 'expense' ? '#ef4444' : '#10b981'};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -249,13 +271,18 @@ const SubmitButton = styled.button<{ $type: TransactionType }>`
   }
   
   &:hover:not(:disabled) {
-    background-color: ${props => props.$type === 'expense' ? '#dc2626' : '#059669'};
+    background: ${props => props.$type === 'expense' ? 
+      'linear-gradient(135deg, #dc2626, #b91c1c)' : 
+      'linear-gradient(135deg, #059669, #047857)'};
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
   
   &:disabled {
-    background-color: #d1d5db;
+    background: linear-gradient(135deg, #666666, #555555);
+    border-color: #666666;
     cursor: not-allowed;
+    color: #999999;
   }
 `;
 
@@ -267,18 +294,21 @@ const QuickAmountGrid = styled.div`
 
 const QuickAmountButton = styled.button`
   padding: 10px;
-  background-color: #f3f4f6;
-  color: #374151;
-  font-weight: 500;
+  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+  color: #cccccc;
+  font-weight: 600;
   font-size: 14px;
-  border: none;
+  border: 1px solid #666666;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: #e5e7eb;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000000;
+    border-color: #FFD700;
     transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
   }
 `;
 
@@ -321,13 +351,7 @@ const TransactionInput: React.FC<TransactionInputProps> = ({
     setCategories(userCategories);
   };
 
-  const filteredCategories = categories.filter(cat => {
-    if (transactionType === 'expense') {
-      return !['給料', '臨時収入', '副収入'].includes(cat.name);
-    } else {
-      return ['給料', '臨時収入', '副収入', 'その他'].includes(cat.name);
-    }
-  });
+  const filteredCategories = categories.filter(cat => cat.type === transactionType);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
