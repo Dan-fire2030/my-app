@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import {
   getLatestBudget,
   createNewBudget,
@@ -145,8 +146,8 @@ const HamburgerButton = styled.button`
   }
   
   @media (max-width: 640px) {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
   }
 `;
 
@@ -681,6 +682,57 @@ const BudgetApp = () => {
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [budgetConfirmStep, setBudgetConfirmStep] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [categoryRefreshKey, setCategoryRefreshKey] = useState(0);
+
+  // ヘルパー関数
+  const getCurrentMonth = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  };
+
+  const isBudgetSetForCurrentMonth = (latestBudget) => {
+    if (!latestBudget || !latestBudget.created_at) {
+      console.log('📅 No budget or created_at field');
+      return false;
+    }
+
+    // Firestoreのタイムスタンプを処理
+    let budgetDate;
+    if (latestBudget.created_at.toDate) {
+      budgetDate = latestBudget.created_at.toDate();
+    } else if (latestBudget.created_at instanceof Date) {
+      budgetDate = latestBudget.created_at;
+    } else {
+      budgetDate = new Date(latestBudget.created_at);
+    }
+
+    const budgetMonth = `${budgetDate.getFullYear()}-${String(budgetDate.getMonth() + 1).padStart(2, '0')}`;
+    const currentMonth = getCurrentMonth();
+
+    console.log('📅 Date comparison:', {
+      budgetDate: budgetDate.toISOString(),
+      budgetMonth,
+      currentMonth,
+      matches: budgetMonth === currentMonth
+    });
+
+    return budgetMonth === currentMonth;
+  };
+
+  // カテゴリー読み込み関数
+  const loadCategories = async () => {
+    if (!user?.uid) return;
+    
+    try {
+      // カテゴリー取得のサービス関数があると仮定
+      // 実際の実装では getUserCategories を import する必要があります
+      console.log('Loading categories for user:', user.uid);
+      setCategoryRefreshKey(prev => prev + 1);
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+    }
+  };
 
   // useEffectも条件分岐の前に配置
   useEffect(() => {
@@ -697,39 +749,7 @@ const BudgetApp = () => {
       }
     };
 
-    const getCurrentMonth = () => {
-      const now = new Date();
-      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    };
-
-    const isBudgetSetForCurrentMonth = (latestBudget) => {
-      if (!latestBudget || !latestBudget.created_at) {
-        console.log('📅 No budget or created_at field');
-        return false;
-      }
-
-      // Firestoreのタイムスタンプを処理
-      let budgetDate;
-      if (latestBudget.created_at.toDate) {
-        budgetDate = latestBudget.created_at.toDate();
-      } else if (latestBudget.created_at instanceof Date) {
-        budgetDate = latestBudget.created_at;
-      } else {
-        budgetDate = new Date(latestBudget.created_at);
-      }
-
-      const budgetMonth = `${budgetDate.getFullYear()}-${String(budgetDate.getMonth() + 1).padStart(2, '0')}`;
-      const currentMonth = getCurrentMonth();
-
-      console.log('📅 Date comparison:', {
-        budgetDate: budgetDate.toISOString(),
-        budgetMonth,
-        currentMonth,
-        matches: budgetMonth === currentMonth
-      });
-
-      return budgetMonth === currentMonth;
-    };
+    // ヘルパー関数は上部で定義済み
 
     const fetchInitialData = async () => {
       console.log('fetchInitialData: Starting for user:', {
@@ -820,6 +840,19 @@ const BudgetApp = () => {
     }
   }, [user]);
 
+  // Status Bar設定（モバイル用）
+  useEffect(() => {
+    const setStatusBar = async () => {
+      try {
+        await StatusBar.setStyle({ style: Style.Dark });
+        await StatusBar.setBackgroundColor({ color: '#000000' });
+      } catch (error) {
+        // Web環境では無視
+      }
+    };
+    setStatusBar();
+  }, []);
+
   // 認証ローディング中の表示
   if (loading) {
     return (
@@ -843,11 +876,7 @@ const BudgetApp = () => {
     return <AuthPage />;
   }
 
-  // ヘルパー関数を定義
-  const getCurrentMonth = () => {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  };
+  // ヘルパー関数は上部で既に定義済み
 
   const isCurrentMonthBudgetSet = () => {
     return monthlyBudget > 0 && currentBudgetId;
@@ -1115,6 +1144,7 @@ const BudgetApp = () => {
           </ExpenseModalHeader>
 
           <TransactionInput
+            key={categoryRefreshKey}
             expenseAmount={expenseAmount}
             switchingButton={true}
             selectedRadioButton={selectedRadioButton}
@@ -1145,7 +1175,9 @@ const BudgetApp = () => {
           <MenuContent>
             {/* カテゴリー管理 */}
             <CategoryManager onCategoryChange={() => {
-              // カテゴリーが変更された時の処理があればここに記述
+              // カテゴリーが変更されたときにTransactionInputを強制更新
+              console.log('Category changed, refreshing transaction input');
+              setCategoryRefreshKey(prev => prev + 1);
             }} />
 
             {/* 月次設定ボタン - 未設定時は通常のBudgetSetting、設定済み時はモーダル開くボタン */}

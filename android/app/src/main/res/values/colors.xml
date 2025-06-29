@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFD700</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#FFA500</color>
+    <color name="statusBarBackground">#000000</color>
+    <color name="splashBackground">#000000</color>
+    <color name="splashTextColor">#FFD700</color>
+</resources>

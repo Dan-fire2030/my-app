@@ -344,11 +344,22 @@ const TransactionInput: React.FC<TransactionInputProps> = ({
     }
   }, [user]);
 
+  // key prop が変わると自動的にコンポーネントが再マウントされる
+
   const loadCategories = async () => {
     if (!user) return;
-    await categoryService.initializeDefaultCategories(user.uid);
-    const userCategories = await categoryService.getUserCategories(user.uid);
-    setCategories(userCategories);
+    
+    try {
+      console.log('TransactionInput: Loading categories for user:', user.uid);
+      await categoryService.initializeDefaultCategories(user.uid);
+      const userCategories = await categoryService.getUserCategories(user.uid);
+      setCategories(userCategories);
+      console.log('TransactionInput: Categories loaded:', userCategories.length);
+    } catch (error) {
+      console.error('TransactionInput: Failed to load categories:', error);
+      // フォールバック: デフォルトカテゴリーのみ表示
+      setCategories([]);
+    }
   };
 
   const filteredCategories = categories.filter(cat => cat.type === transactionType);

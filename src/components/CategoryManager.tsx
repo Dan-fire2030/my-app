@@ -17,7 +17,7 @@ const Container = styled.div`
 const Title = styled.h2`
   font-size: 18px;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin: 0;
   color: #FFD700;
   text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 `;
@@ -95,22 +95,26 @@ const AddButton = styled.button`
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
-  border: 2px dashed #FFD700;
-  border-radius: 20px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  border: none;
+  border-radius: 24px;
   font-size: 14px;
-  color: #FFD700;
+  color: #000000;
   cursor: pointer;
   transition: all 0.2s;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
   
   &:hover {
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    border-color: #FFD700;
-    color: #000000;
+    background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
+    box-shadow: 0 6px 16px rgba(255, 215, 0, 0.5);
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
     box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
-    transform: translateY(-1px);
   }
 `;
 
@@ -406,7 +410,14 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onCategoryChan
 
   return (
     <Container>
-      <Title>カテゴリー管理</Title>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <Title>カテゴリー管理</Title>
+        <AddButton onClick={() => setIsModalOpen(true)}>
+          <FaPlus size={14} />
+          <span>新規カテゴリー追加</span>
+        </AddButton>
+      </div>
+      
       <div style={{ marginBottom: '16px' }}>
         <div style={{ marginBottom: '12px' }}>
           <strong style={{ fontSize: '14px', color: '#666' }}>支出カテゴリー</strong>
@@ -427,10 +438,6 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onCategoryChan
             )}
           </CategoryItem>
         ))}
-        <AddButton onClick={() => setIsModalOpen(true)}>
-          <FaPlus size={12} />
-          <span>新規追加</span>
-        </AddButton>
       </CategoryList>
       </div>
       
@@ -454,10 +461,6 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onCategoryChan
               )}
             </CategoryItem>
           ))}
-          <AddButton onClick={() => setIsModalOpen(true)}>
-            <FaPlus size={12} />
-            <span>新規追加</span>
-          </AddButton>
         </CategoryList>
       </div>
 

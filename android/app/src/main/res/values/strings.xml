@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">高級資産トラッカー</string>
+    <string name="title_activity_main">高級資産トラッカー</string>
+    <string name="package_name">com.luxurywealth.tracker</string>
+    <string name="custom_url_scheme">com.luxurywealth.tracker</string>
+</resources>
