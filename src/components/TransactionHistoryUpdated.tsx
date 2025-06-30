@@ -181,6 +181,11 @@ const ConfirmButtons = styled.div`
   display: flex;
   gap: 8px;
   align-items: center;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 4px;
+  }
 `;
 
 const ConfirmButton = styled.button`
@@ -193,10 +198,17 @@ const ConfirmButton = styled.button`
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
   
   &:hover {
     background: linear-gradient(135deg, #cc0000 0%, #aa0000 100%);
     box-shadow: 0 2px 8px rgba(255, 68, 68, 0.3);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 4px 10px;
+    font-size: 11px;
+    width: 100%;
   }
 `;
 
@@ -210,11 +222,18 @@ const CancelButton = styled.button`
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
   
   &:hover {
     background: linear-gradient(135deg, #333333 0%, #2a2a2a 100%);
     border-color: #FFD700;
     color: #FFD700;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 4px 10px;
+    font-size: 11px;
+    width: 100%;
   }
 `;
 
@@ -327,9 +346,11 @@ const TransactionHistoryUpdated: React.FC<TransactionHistoryProps> = ({
                 </TransactionLeft>
                 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-                  <TransactionDate>
-                    {formatDate(transaction.date)}
-                  </TransactionDate>
+                  {deleteConfirmIndex !== index && (
+                    <TransactionDate>
+                      {formatDate(transaction.date)}
+                    </TransactionDate>
+                  )}
                   
                   <ActionButtons>
                     {deleteConfirmIndex === index ? (

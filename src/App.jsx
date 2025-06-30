@@ -146,8 +146,8 @@ const HamburgerButton = styled.button`
   }
   
   @media (max-width: 640px) {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
   }
 `;
 
@@ -156,6 +156,11 @@ const HamburgerIcon = styled.div`
   position: relative;
   width: 24px;
   height: 24px;
+  
+  @media (max-width: 640px) {
+    width: 20px;
+    height: 20px;
+  }
   
   .line {
     position: absolute;
@@ -580,7 +585,7 @@ const BudgetSetupHeader = styled.div`
 const BudgetSetupTitle = styled.h2`
   font-size: 24px;
   font-weight: 700;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -588,7 +593,7 @@ const BudgetSetupTitle = styled.h2`
 `;
 
 const BudgetSetupSubtitle = styled.p`
-  color: #6b7280;
+  color: #cccccc;
   font-size: 16px;
   margin: 0;
 `;
@@ -599,8 +604,8 @@ const BudgetSetupContent = styled.div`
 `;
 
 const BudgetConfirmSection = styled.div`
-  background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
-  border: 1px solid #bfdbfe;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+  border: 1px solid #FFD700;
   border-radius: 12px;
   padding: 20px;
   text-align: center;
@@ -609,12 +614,12 @@ const BudgetConfirmSection = styled.div`
 const BudgetConfirmAmount = styled.div`
   font-size: 32px;
   font-weight: 700;
-  color: #1e40af;
+  color: #FFD700;
   margin-bottom: 8px;
 `;
 
 const BudgetConfirmText = styled.p`
-  color: #374151;
+  color: #cccccc;
   font-size: 16px;
   margin: 0;
 `;
@@ -636,20 +641,23 @@ const BudgetActionButton = styled.button`
   transition: all 0.3s ease;
   
   ${props => props.primary ? `
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    color: white;
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #000000;
+    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
     
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
     }
   ` : `
-    background: #f3f4f6;
-    color: #374151;
+    background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+    color: #cccccc;
+    border: 1px solid #666666;
     
     &:hover {
-      background: #e5e7eb;
+      background: linear-gradient(135deg, #333333 0%, #2a2a2a 100%);
+      border-color: #FFD700;
+      color: #FFD700;
     }
   `}
 `;

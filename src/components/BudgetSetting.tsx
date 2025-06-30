@@ -110,12 +110,8 @@ const BudgetInput = styled.input`
   }
   
   &:disabled {
-    outline: none;
-    border-color: #3b82f6;
-  }
-  
-  &::placeholder {
-    color: #9ca3af;
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 `;
 
@@ -167,14 +163,14 @@ const WarningBox = styled.div`
 const WarningIcon = styled.svg`
   width: 20px;
   height: 20px;
-  color: #f59e0b;
+  color: #FFD700;
   flex-shrink: 0;
   margin-top: 2px;
 `;
 
 const WarningText = styled.p`
   font-size: 14px;
-  color: #92400e;
+  color: #FFA500;
   line-height: 1.5;
 `;
 
