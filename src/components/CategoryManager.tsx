@@ -20,6 +20,11 @@ const Title = styled.h2`
   margin: 0;
   color: #FFD700;
   text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+  white-space: nowrap;
+  
+  @media (max-width: 640px) {
+    font-size: 16px;
+  }
 `;
 
 const CategoryList = styled.div`
@@ -105,6 +110,8 @@ const AddButton = styled.button`
   transition: all 0.2s;
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  white-space: nowrap;
+  flex-shrink: 0;
   
   &:hover {
     background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
@@ -115,6 +122,12 @@ const AddButton = styled.button`
   &:active {
     transform: translateY(0);
     box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  }
+  
+  @media (max-width: 640px) {
+    font-size: 12px;
+    padding: 8px 16px;
+    gap: 6px;
   }
 `;
 
@@ -410,7 +423,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onCategoryChan
 
   return (
     <Container>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '12px', flexWrap: 'nowrap' }}>
         <Title>カテゴリー管理</Title>
         <AddButton onClick={() => setIsModalOpen(true)}>
           <FaPlus size={14} />

@@ -580,6 +580,11 @@ const BudgetSetupHeader = styled.div`
   position: relative;
   text-align: center;
   margin-bottom: 32px;
+  padding-right: 60px;
+  
+  @media (max-width: 640px) {
+    padding-right: 50px;
+  }
 `;
 
 const BudgetSetupTitle = styled.h2`
@@ -1248,8 +1253,8 @@ const BudgetApp = () => {
               }}
               style={{
                 position: 'absolute',
-                top: '20px',
-                right: '20px'
+                top: '16px',
+                right: '16px'
               }}
             >
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
