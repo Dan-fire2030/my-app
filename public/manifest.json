@@ -1,26 +1,33 @@
 {
-  "short_name": "家計簿",
-  "name": "シンプル家計簿",
+  "short_name": "Wealth Tracker",
+  "name": "Wealth Tracker - Master Your Budget",
+  "description": "シンプルで使いやすい家計簿アプリ。収支管理と予算設定で資産を見える化",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "/favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "Icon-192.png",
+      "src": "/Icon-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
-      "src": "Icon-512.png",
+      "src": "/Icon-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#3b82f6",
   "background_color": "#f9fafb",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "categories": ["finance", "productivity"],
+  "lang": "ja",
+  "dir": "ltr"
 }

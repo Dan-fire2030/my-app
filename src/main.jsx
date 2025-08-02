@@ -5,10 +5,12 @@ import './index.css';
 import { register } from './serviceWorkerRegistration';
 import { AuthProvider } from './contexts/FirebaseAuthContext';
 
-// Service Worker登録を一時的に無効化
-// if (process.env.NODE_ENV === "production") {
-//   register();
-// }
+// Service Worker登録（PWA有効化）
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    register();
+  });
+}
 
 
 // WebSocketの問題を防止（コメントアウト）

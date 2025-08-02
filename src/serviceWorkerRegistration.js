@@ -1,45 +1,44 @@
 // Service Workerを登録する関数
 export function register() {
   if ("serviceWorker" in navigator) {
-    // 既存のService Workerを解除してから登録
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      for (let registration of registrations) {
-        registration.unregister();
-      }
+    const swUrl = `${window.location.origin}/service-worker.js`;
 
-      // 古いService Workerがアンロードされるのを待つ
-      setTimeout(() => {
-        const swUrl = `${window.location.origin}/service-worker.js`;
+    navigator.serviceWorker
+      .register(swUrl)
+      .then((registration) => {
+        console.log("Service Worker registered:", registration.scope);
 
-        navigator.serviceWorker
-          .register(swUrl)
-          .then((registration) => {
-            // Service Worker登録成功
+        // 定期的に更新をチェック
+        setInterval(() => {
+          registration.update();
+        }, 60000); // 1分ごと
 
-            // 更新を確認
-            registration.update();
-
-            // 新しいService Workerが見つかった場合
-            registration.onupdatefound = () => {
-              const installingWorker = registration.installing;
-              if (installingWorker) {
-                installingWorker.onstatechange = () => {
-                  if (installingWorker.state === "installed") {
-                    if (navigator.serviceWorker.controller) {
-                      // console.log("新しいService Workerが利用可能です");
-                    } else {
-                      // console.log("Service Workerがオフラインで使用できます");
-                    }
+        // 新しいService Workerが見つかった場合
+        registration.onupdatefound = () => {
+          const installingWorker = registration.installing;
+          if (installingWorker) {
+            installingWorker.onstatechange = () => {
+              if (installingWorker.state === "installed") {
+                if (navigator.serviceWorker.controller) {
+                  // 新しいバージョンが利用可能
+                  console.log("New content is available; please refresh.");
+                  
+                  // ユーザーに更新を通知する場合はここに処理を追加
+                  if (window.confirm("新しいバージョンが利用可能です。更新しますか？")) {
+                    window.location.reload();
                   }
-                };
+                } else {
+                  // コンテンツがオフラインで利用可能
+                  console.log("Content is cached for offline use.");
+                }
               }
             };
-          })
-          .catch(() => {
-            // Service Worker登録失敗
-          });
-      }, 1000); // 1秒待ってから再登録
-    });
+          }
+        };
+      })
+      .catch((error) => {
+        console.error("Service Worker registration failed:", error);
+      });
   }
 }
 
